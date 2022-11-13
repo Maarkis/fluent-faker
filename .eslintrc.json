@@ -1,0 +1,51 @@
+{
+  "root": true,
+  "ignorePatterns": [
+    "dist"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "*.ts"
+      ],
+      "parserOptions": {
+        "project": [
+          "tsconfig.json"
+        ],
+        "createDefaultProgram": true
+      },
+      "extends": [
+        "plugin:prettier/recommended"
+      ],
+      "rules": {
+        "semi": [
+          "error",
+          "always"
+        ],
+        "quotes": [
+          "error",
+          "single"
+        ],
+        "no-console": "error",
+        "no-empty": "error",
+        "no-unsafe-negation": [
+          "error",
+          {
+            "enforceForOrderingRelations": true
+          }
+        ],
+        "no-var": "error",
+        "no-debugger": "error",
+        "no-duplicate-imports": "error",
+        "no-nested-ternary": "error",
+        "no-throw-literal": "error",
+        "no-useless-constructor": "error",
+        "arrow-spacing": "error"
+      }
+    }
+  ]
+}
