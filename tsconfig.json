@@ -4,11 +4,11 @@
     "rootDir": ".",
     "baseUrl": "./src",
     "outDir": "./dist",
-    "lib": ["ES2021", "ES6"],
     "noImplicitReturns": false,
     "sourceMap": true,
-    "target": "ES6",
-    "module": "ES2022",
+    "target": "ES2015",
+    "module": "CommonJS",
+    "lib": ["ES5"],
     "declaration": true,
     "alwaysStrict": true,
     "strict": true,
@@ -19,9 +19,6 @@
     "forceConsistentCasingInFileNames": true,
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitOverride": true,
-    "paths": {
-      "fluent-faker": [ "dist/fluent0-faker"]
-    }
   },
   "include": [ "src/**/*" ],
   "exclude": ["node_modules", "**/*.spec.*"]
