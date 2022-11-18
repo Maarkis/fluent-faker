@@ -45,7 +45,7 @@
     "access": "public"
   },
   "files": [
-    "dist"
+    "dist/"
   ],
   "main": "dist/cjs/index.js",
   "module": "dist/mjs/index.js",

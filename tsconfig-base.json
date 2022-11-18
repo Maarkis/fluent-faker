@@ -3,7 +3,7 @@
   "compilerOptions": {
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
-    "rootDir": ".",
+    "rootDir": "src",
     "baseUrl": "./src",
     "esModuleInterop": true,
     "inlineSourceMap": false,
@@ -26,5 +26,5 @@
     "types": ["node", "jest"]
   },
   "include": [ "src/**/*" ],
-  "exclude": ["node_modules", "**/*.spec.*"]
+  "exclude": ["node_modules", "dist", "**/*.spec.*"]
 }
