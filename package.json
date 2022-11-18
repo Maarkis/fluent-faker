@@ -30,26 +30,35 @@
   },
   "scripts": {
     "prepare": "husky install",
-    "build": "tsc",
+    "build": "pnpm run clean:build && pnpm run build:node && pnpm run build:types",
+    "build:node": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && bash ./fixup",
+    "build:types": "tsc --emitDeclarationOnly --declaration --outDir dist/types",
     "check": "prettier --check \"src/**/*.ts\" && eslint --ext .js,.ts .",
     "prettier": "prettier --write \"src/**/*.ts\"",
     "test": "jest",
     "coverage": "jest --coverage",
     "lint": "eslint --ext .js,.ts . --fix",
     "clean": "rimraf coverage node_modules dist",
-    "clean:build": "rimraf dist"
+    "clean:build": "rimraf dist/*"
   },
   "publishConfig": {
     "access": "public"
   },
-  "main": "dist/src/index.js",
-  "types": "dist/src/index.d.ts",
   "files": [
-    "dist/src"
+    "dist"
   ],
+  "main": "dist/cjs/index.js",
+  "module": "dist/mjs/index.js",
+  "types": "dist/types/index.d.ts",
   "exports": {
-    ".": "./dist/src/index.js",
-    "./builder": "./dist/src/builder.js"
+    ".": {
+      "import": "./dist/mjs/index.js",
+      "require": "./dist/cjs/index.js"
+    },
+    "./builder": {
+      "import": "./dist/mjs/builder.js",
+      "require": "./dist/cjs/builder.js"
+    }
   },
   "license": "MIT",
   "devDependencies": {
