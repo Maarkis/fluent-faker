@@ -55,6 +55,11 @@
       "types": "./dist/types/index.d.ts",
       "import": "./dist/mjs/index.js",
       "require": "./dist/cjs/index.js"
+    },
+    "./builder/*": {
+      "types": "./dist/types/builder.d.ts",
+      "import": "./dist/mjs/builder.js",
+      "require": "./dist/cjs/builder.js"
     }
   },
   "typesVersions": {
