@@ -63,3 +63,5 @@ export function setLocale(locale: string): void {
 export function useSeed(seed: number): number {
 	return faker.seed(seed);
 }
+
+export { Builder };
