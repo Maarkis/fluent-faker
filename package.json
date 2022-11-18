@@ -47,6 +47,10 @@
   "files": [
     "dist/src"
   ],
+  "exports": {
+    ".": "./dist/src/index.js",
+    "./builder": "./dist/src/builder.js"
+  },
   "license": "MIT",
   "devDependencies": {
     "@jest/globals": "^29.3.1",
