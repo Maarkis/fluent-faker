@@ -1,10 +1,6 @@
 # Fluent-Faker
 
----
-
 # Getting Started
-
----
 
 ## Overview
 
@@ -68,8 +64,6 @@ generate<Todo>({id: 1, name: 'Todo 1'}, 2)
 
 ## Switching locales
 
----
-
 By default fluent-faker uses Faker.js default locale
 
 Although you can change locale with `setLocale` function, both in `Builder` and global
@@ -104,8 +98,6 @@ new Builder<People>().setLocale('pt_BR')
 
 ## Using seed
 
----
-
 Sets the seed or generates a new one
 
 Please note that generated values are dependent on both the seed and the number of calls that have
@@ -135,8 +127,6 @@ new Builder<Todo>().useSeed(596) // 596
 
 
 ## API Reference
-
----
 
 ### createBuilder
 
