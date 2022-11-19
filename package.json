@@ -38,7 +38,7 @@
     "test": "jest",
     "coverage": "jest --coverage",
     "lint": "eslint --ext .js,.ts . --fix",
-    "clean": "rimraf coverage node_modules dist",
+    "clean": "rimraf dist coverage node_modules",
     "clean:build": "rimraf dist/*"
   },
   "publishConfig": {
