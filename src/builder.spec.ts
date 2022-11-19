@@ -1,4 +1,5 @@
 import { Builder } from './builder';
+import { faker } from '@faker-js/faker';
 
 interface People {
 	id: number;
@@ -36,6 +37,7 @@ const generateName = Builder.prototype.generate.name;
 const setLocaleName = Builder.prototype.setLocale.name;
 const seedName = Builder.prototype.useSeed.name;
 const addSetName = Builder.prototype.addSet.name;
+const useSetName = Builder.prototype.useSet.name;
 const cloneName = Builder.prototype.clone.name;
 
 describe(`Suite test ${Builder.name}`, () => {
@@ -91,6 +93,29 @@ describe(`Suite test ${Builder.name}`, () => {
 		const value = sut.addModel(model).generate();
 
 		expect(value).toStrictEqual({ ...model });
+	});
+
+	it(`${addModelName} should build a complex configuration using Faker`, () => {
+		jest.useFakeTimers();
+		const seed = faker.datatype.number({ min: 1, max: 999 });
+		faker.seed(seed);
+		sut.useSeed(seed);
+		const valueExpected = {
+			name: faker.name.firstName(),
+			lastName: faker.name.lastName(),
+			age: faker.datatype.number({ min: 1, max: 99 }),
+			birthday: faker.date.past(100),
+		};
+		const value = sut
+			.addModel((faker) => ({
+				name: faker.name.firstName(),
+				lastName: faker.name.lastName(),
+				age: faker.datatype.number({ min: 1, max: 99 }),
+				birthday: faker.date.past(100),
+			}))
+			.generate();
+
+		expect(value).toStrictEqual(valueExpected);
 	});
 
 	it(`${ruleForName} should configure a rule for a string property`, () => {
@@ -198,7 +223,7 @@ describe(`Suite test ${Builder.name}`, () => {
 		expect(values.length).toBe(3);
 	});
 
-	it(`${addSetName} should build object instance from set configuration`, () => {
+	it(`${addSetName} should add a ruleset correctly`, () => {
 		const id = 1;
 		const name = 'name new people';
 
@@ -207,7 +232,25 @@ describe(`Suite test ${Builder.name}`, () => {
 		expect(value).toStrictEqual({ id, name });
 	});
 
-	it(`${addSetName} should build collection from set configuration`, () => {
+	it(`${addSetName} should throw error when you have an item with the same key has already been added`, () => {
+		sut.addSet('any set', { id: 1, name: 'name people' });
+
+		const value = () => sut.addSet('any set', { id: 1, name: 'other name people' });
+
+		expect(value).toThrow('An item with the same key has already been added');
+	});
+
+	it(`${useSetName} should build object instance from set configuration`, () => {
+		const id = 1;
+		const name = 'name new people';
+		sut.addSet('new people', { id, name });
+
+		const value = sut.useSet('new people').generate();
+
+		expect(value).toStrictEqual({ id, name });
+	});
+
+	it(`${useSetName} should build collection from set configuration`, () => {
 		const id = 1;
 		const name = 'name new people';
 
@@ -216,7 +259,26 @@ describe(`Suite test ${Builder.name}`, () => {
 		expect(value).toStrictEqual([{ id, name }]);
 	});
 
-	it(`${addSetName} should building empty object when the set is not found`, () => {
+	it(`${useSetName} should build object instance from set configuration using Faker`, () => {
+		const seed = faker.datatype.number({ min: 1, max: 999 });
+		faker.seed(seed);
+		sut.useSeed(seed);
+		const valueExpected = {
+			name: faker.name.firstName(),
+			lastName: faker.name.lastName(),
+		};
+		const value = sut
+			.addSet('any set', (faker) => ({
+				name: faker.name.firstName(),
+				lastName: faker.name.lastName(),
+			}))
+			.useSet('any set')
+			.generate();
+
+		expect(value).toStrictEqual(valueExpected);
+	});
+
+	it(`${useSetName} should building empty object when the set is not found`, () => {
 		const value = sut
 			.addSet('any set', { id: 1, name: 'name people' })
 			.useSet('other set')

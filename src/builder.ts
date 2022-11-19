@@ -1,9 +1,9 @@
-import { Faker, faker } from '@faker-js/faker';
+import { Faker, faker as FakerJs } from '@faker-js/faker';
 import reduce from 'lodash.reduce';
 import isFunction from 'lodash.isfunction';
 import cloneDeep from 'lodash.clonedeep';
 
-const locales = faker.locales;
+const locales = FakerJs.locales;
 
 type ValueFunction<T, P extends keyof T> = (faker: Faker) => T[P];
 
@@ -14,22 +14,23 @@ interface Rule<T, P extends keyof T> {
 }
 
 export class Builder<T> {
-	private _rules: Rule<T, keyof T>[] = [];
-	private _rulesSets: Map<string, Rule<T, keyof T>[]> = new Map<string, Rule<T, keyof T>[]>();
-	private _locale = 'en';
-	private _rulesSetsFactoryFunction: [useSet: boolean, factoryFunction?: () => T] = [false];
+	private rules: Rule<T, keyof T>[] = [];
+	private rulesSets: Map<string, Rule<T, keyof T>[]> = new Map<string, Rule<T, keyof T>[]>();
+	private rulesSetsFactoryFunction: [useSet: boolean, factoryFunction?: () => T] = [false];
+
+	private localLocale = 'en';
 
 	/**
 	 * The local seed of Faker if available. Null local seed means the Global property is being used.
-	 * @private _seed
+	 * @private localSeed
 	 */
-	private _seed?: number;
+	private localSeed?: number;
 
 	/**
 	 * The internal Faker object that is used in (faker) => faker rules.
-	 * @private _faker
+	 * @private faker
 	 */
-	private readonly _faker: Faker;
+	private readonly faker: Faker;
 
 	/**
 	 * Create Builder
@@ -39,13 +40,13 @@ export class Builder<T> {
 	 * @return new instance of Builder
 	 */
 	constructor(locale?: string) {
-		this._faker = new Faker({ locales });
-		this.setLocale(locale ?? this._locale);
+		this.faker = new Faker({ locales });
+		this.setLocale(locale ?? this.localLocale);
 	}
 
 	/**
-	 * Defines a set of rules under a specific name. Useful for defining rules for special cases
-	 * @param config The dataset to apply when the set is specified, presets are not stored
+	 * Defines a set of rules. Useful for defining rules for special cases
+	 * @param model The dataset to apply when the set is specified, presets are not stored
 	 * @example
 	 * 		new Builder<People>().addModel({
 	 * 			name: 'person name',
@@ -53,16 +54,33 @@ export class Builder<T> {
 	 * 		})
 	 * @return instance of Builder
 	 */
-	public addModel(config: Partial<T>): Builder<T> {
-		const clone = cloneDeep(config);
-		this._rules.push(...this.createRulesByEntries(clone));
+	public addModel(model: Partial<T>): Builder<T>;
+	/**
+	 * Defines a set of rules under a specific name. Useful for defining rules for special cases
+	 * @param model The dataset to apply when the set is specified, presets are not stored
+	 * @example
+	 * 		new Builder<People>().addModel(faker => ({
+	 * 			name: faker.name.firstName(),
+	 * 			lastName: faker.name.lastName()
+	 * 		}))
+	 * @return instance of Builder
+	 */
+	public addModel(model: (faker: Faker) => Partial<T>): Builder<T>;
+	public addModel(model: Partial<T> | ((faker: Faker) => Partial<T>)): Builder<T> {
+		if (isFunction(model)) {
+			// TODO REFACTOR - BUG GENERATED SAME VALUES
+			this.addRules(this.createRulesByEntries(model(this.faker)));
+			return this;
+		}
+		const clone = cloneDeep(model);
+		this.rules.push(...this.createRulesByEntries(clone));
 		return this;
 	}
 
 	/**
 	 * Defines a set of rules under a specific name. Useful for defining rules for special cases
 	 * @param name  The set name
-	 * @param config The dataset to apply when the set is specified, presets are stored
+	 * @param dataSet The dataset to apply when the set is specified, presets are stored
 	 * @example
 	 * 		new Builder<People>().addSet('good person', {
 	 * 			name: 'good person name',
@@ -70,8 +88,27 @@ export class Builder<T> {
 	 * 		})
 	 * @return instance of Builder
 	 */
-	public addSet(name: string, config: Partial<T>): Builder<T> {
-		const clone = cloneDeep(config);
+	public addSet(name: string, dataSet: Partial<T>): Builder<T>;
+	/**
+	 * Defines a set of rules under a specific name. Useful for defining rules for special cases
+	 * @param name  The set name
+	 * @param dataSet The dataset to apply when the set is specified, presets are stored
+	 * @example
+	 * 		new Builder<People>().addSet('good person', faker => ({
+	 * 			name: faker.name.firstName(),
+	 * 			lastName: faker.name.lastName()
+	 * 		}))
+	 * @return instance of Builder
+	 */
+	public addSet(name: string, dataSet: (faker: Faker) => Partial<T>): Builder<T>;
+	public addSet(name: string, dataSet: Partial<T> | ((faker: Faker) => Partial<T>)): Builder<T> {
+		if (isFunction(dataSet)) {
+			// TODO REFACTOR - BUG GENERATED SAME VALUES
+			this.addRuleSets(name.toLowerCase(), this.createRulesByEntries(dataSet(this.faker)));
+			return this;
+		}
+
+		const clone = cloneDeep(dataSet);
 		this.addRuleSets(name.toLowerCase(), this.createRulesByEntries(clone));
 		return this;
 	}
@@ -86,12 +123,12 @@ export class Builder<T> {
 	 * @return instance of Builder
 	 */
 	public useSet(name: string): Builder<T> {
-		const rulesSets = this._rulesSets.get(name.toLowerCase());
+		const rulesSets = this.rulesSets.get(name.toLowerCase());
 		if (!rulesSets) {
 			return this;
 		}
 
-		this._rulesSetsFactoryFunction = [true, this.createFactoryFunction(rulesSets)];
+		this.rulesSetsFactoryFunction = [true, this.createFactoryFunction(rulesSets)];
 		return this;
 	}
 
@@ -151,25 +188,21 @@ export class Builder<T> {
 		if (length && length < 0)
 			throw new Error('property length be greater than greater than or equal to 0.');
 
-		const [useSet, rulesSetsFactory] = this._rulesSetsFactoryFunction;
-		const rulesFactoryFunction = this.createFactoryFunction(this._rules);
+		const [useSet, rulesSetsFactoryFunction] = this.rulesSetsFactoryFunction;
+		const rulesFactoryFunction = this.createFactoryFunction(this.rules);
 		const factoryFunction =
-			useSet && rulesSetsFactory
+			useSet && rulesSetsFactoryFunction
 				? () => ({
-						...rulesSetsFactory(),
+						...rulesSetsFactoryFunction(),
 						...rulesFactoryFunction(),
 				  })
 				: () => ({
 						...rulesFactoryFunction(),
 				  });
 
-		const instance =
-			length || length == 0
-				? this.buildWithQuantity(length, factoryFunction)
-				: this.build(factoryFunction);
-
-		this.resetRules();
-		return instance;
+		return length || length == 0
+			? this.buildWithQuantity(length, factoryFunction)
+			: this.build(factoryFunction);
 	}
 
 	/**
@@ -179,8 +212,8 @@ export class Builder<T> {
 	 * 		new Builder<People>().setLocale('pt_BR')
 	 */
 	public setLocale(locale: string): void {
-		this._faker.setLocale(locale);
-		this._locale = locale;
+		this.faker.setLocale(locale);
+		this.localLocale = locale;
 	}
 
 	/**
@@ -191,7 +224,7 @@ export class Builder<T> {
 	 * 	@return locale string
 	 */
 	public get locale(): string {
-		return this._locale;
+		return this.localLocale;
 	}
 
 	/**
@@ -202,7 +235,7 @@ export class Builder<T> {
 	 * 	@return The seed that was set
 	 */
 	public useSeed(seed: number): number {
-		return (this._seed = this._faker.seed(seed));
+		return (this.localSeed = this.faker.seed(seed));
 	}
 
 	/**
@@ -212,23 +245,23 @@ export class Builder<T> {
 	 * @return  new Builder instance with cloned builder configuration
 	 */
 	public clone(): Builder<T> {
-		const builder = new Builder<T>(this._locale);
-		if (this._seed) builder.useSeed(this._seed);
+		const builder = new Builder<T>(this.localLocale);
+		if (this.localSeed) builder.useSeed(this.localSeed);
 
-		builder._rules = this._rules.map<Rule<T, keyof T>>((rule: Rule<T, keyof T>) => {
+		builder.rules = this.rules.map<Rule<T, keyof T>>((rule: Rule<T, keyof T>) => {
 			return {
 				valueFunction: rule.valueFunction,
 				property: rule.property,
-				value: rule.valueFunction(builder._faker),
+				value: rule.valueFunction(builder.faker),
 			};
 		});
 
-		this._rulesSets.forEach((rules: Rule<T, keyof T>[], key: string) => {
+		this.rulesSets.forEach((rules: Rule<T, keyof T>[], key: string) => {
 			const clonedRulesSets = rules.map((rule: Rule<T, keyof T>) => {
 				return {
 					valueFunction: rule.valueFunction,
 					property: rule.property,
-					value: rule.valueFunction(builder._faker),
+					value: rule.valueFunction(builder.faker),
 				};
 			});
 			builder.addRuleSets(key, clonedRulesSets);
@@ -248,11 +281,17 @@ export class Builder<T> {
 	}
 
 	private addRule(rule: Rule<T, keyof T>): void {
-		this._rules.push(rule);
+		this.rules.push(rule);
+	}
+
+	private addRules(rules: Rule<T, keyof T>[]): void {
+		this.rules.push(...rules);
 	}
 
 	private addRuleSets(name: string, rules: Array<Rule<T, keyof T>>): void {
-		this._rulesSets.set(name, rules);
+		if (this.rulesSets.has(name))
+			throw new Error('An item with the same key has already been added');
+		this.rulesSets.set(name, rules);
 	}
 
 	private createRules<T, P extends keyof T>(
@@ -272,7 +311,7 @@ export class Builder<T> {
 				rules,
 				(prev: T, curr: Rule<T, keyof T>): T => ({
 					...prev,
-					[curr.property]: curr.valueFunction(this._faker),
+					[curr.property]: curr.valueFunction(this.faker),
 				}),
 				{} as T
 			);
@@ -285,7 +324,7 @@ export class Builder<T> {
 		return {
 			valueFunction: valueFunction,
 			property: property,
-			value: valueFunction(this._faker),
+			value: valueFunction(this.faker),
 		};
 	}
 
@@ -301,10 +340,5 @@ export class Builder<T> {
 			rules.push(rule);
 		}
 		return rules;
-	}
-
-	private resetRules(): void {
-		this._rules.length = 0;
-		this._rulesSetsFactoryFunction = [false];
 	}
 }

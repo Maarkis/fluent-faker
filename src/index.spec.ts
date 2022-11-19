@@ -1,4 +1,4 @@
-﻿import { createBuilder, generate, setLocale, useSeed } from './index';
+﻿import { Builder, createBuilder, generate, setLocale, useSeed } from './index';
 import { faker } from '@faker-js/faker';
 
 describe('Suite test Index', () => {
@@ -27,7 +27,7 @@ describe('Suite test Index', () => {
 	});
 
 	it(`${createBuilder.name} should work and generate instance object correctly`, () => {
-		const config: Partial<{ id: 1; name: string; lastName: string }> = {
+		const config: Partial<{ id: number; name: string; lastName: string }> = {
 			id: 1,
 			name: 'name',
 			lastName: 'lastName',
@@ -38,7 +38,7 @@ describe('Suite test Index', () => {
 	});
 
 	it(`${createBuilder.name} should work and generate collection correctly`, () => {
-		const config: Partial<{ id: 1; name: string; lastName: string }> = {
+		const config: Partial<{ id: number; name: string; lastName: string }> = {
 			id: 1,
 			name: 'name',
 			lastName: 'lastName',
@@ -47,6 +47,16 @@ describe('Suite test Index', () => {
 		const value = createBuilder(config).generate(2);
 
 		expect(value).toStrictEqual([{ ...config }, { ...config }]);
+	});
+
+	it(`${createBuilder.name} should work and generate correctly using function`, () => {
+		const value = createBuilder<{ id: number; name: string; lastName: string }>(() => ({
+			id: 12,
+			name: 'name',
+			lastName: 'lastName',
+		})).generate();
+
+		expect(value).toStrictEqual({ id: 12, name: 'name', lastName: 'lastName' });
 	});
 
 	it(`${createBuilder.name} should set locale correctly`, () => {
@@ -76,5 +86,13 @@ describe('Suite test Index', () => {
 		const value = generate(config, 2);
 
 		expect(value).toStrictEqual([{ ...config }, { ...config }]);
+	});
+
+	it(`${generate.name} import correctly`, () => {
+		expect(Builder).toBeTruthy();
+	});
+
+	it(`${generate.name} import correctly`, () => {
+		expect(Builder).toBeTruthy();
 	});
 });
