@@ -64,7 +64,6 @@ generate<Todo>({id: 1, name: 'Todo 1'}, 2)
 // [{ id: 1, name: 'Todo 1' },{ id: 1, name: 'Todo 1' }]
 ```
 
-
 ## Switching locales
 
 By default fluent-faker uses Faker.js default locale
@@ -127,8 +126,6 @@ import {Builder} from '@maarkis/fluent-faker'
 new Builder<Todo>().useSeed(596) // 596
 ```
 
-
-
 ## API Reference
 
 ### createBuilder
@@ -178,48 +175,36 @@ createBuilder<Todo>(() => ({ id: 1, name: 'Todo 1' }), 'pt_BR')
 | _model_  | `Partial<T> / Function` | Initial setup for the builder |    no    |
 | _length_ | `number`                | The locale to set             |    no    |
 
-Returns: new ``T`` instance
+Returns: new ``T`` instance or collection
 
 Usage:
 
 ```ts
 import {generate} from "@maarkis/fluent-faker";
 
-generate({ id: 1, name: 'Todo 1'}) // { id: 1, name: 'Todo 1' }
+generate<Todo>({ id: 1, name: 'Todo 1'}) // { id: 1, name: 'Todo 1' }
 ```
 or
 
 ```ts
 import {generate} from "@maarkis/fluent-faker";
 
-generate((faker) => ({
+generate<Todo>((faker) => ({
     id: faker.datatype.number(),
     name: 'Todo 1'
 })) // { id: 8874, name: 'Todo 1' }
 ```
-
 or
-
 ```ts
-import {createBuilder} from "@maarkis/fluent-faker";
+import {generate} from "@maarkis/fluent-faker";
 
-createBuilder<Todo>((faker) => ({
+generate<Todo>((faker) => ({
     id: faker.datatype.number(),
     name: 'Todo 1'
-}))
+}), 2) // [{ id: 8874, name: 'Todo 1' },{ id: 97856, name: 'Todo 1' }]
 ```
-or
-
-```ts
-import {createBuilder} from "@maarkis/fluent-faker";
-
-createBuilder<Todo>(() => ({ id: 1, name: 'Todo 1' }), 'pt_BR')
-```
----
 
 ## Builder
-
----
 
 ### addModel
 
@@ -433,5 +418,3 @@ new Builder<Todo>()
     }))
     .useSet('todo done')
 ```
-
----
