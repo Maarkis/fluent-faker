@@ -6,11 +6,11 @@ import cloneDeep from 'lodash.clonedeep';
 const locales = FakerJs.locales;
 
 type ValueFunction<T, P extends keyof T> = (faker: Faker) => T[P];
+type EntityFunction<T> = (faker: Faker) => Partial<T>;
 
 interface Rule<T, P extends keyof T> {
-	property: P | string;
-	value: T[keyof T];
-	valueFunction: ValueFunction<T, keyof T>;
+	property?: P | string;
+	valueFunction: EntityFunction<T> | ValueFunction<T, keyof T>;
 }
 
 export class Builder<T> {
@@ -68,8 +68,9 @@ export class Builder<T> {
 	public addModel(model: (faker: Faker) => Partial<T>): Builder<T>;
 	public addModel(model: Partial<T> | ((faker: Faker) => Partial<T>)): Builder<T> {
 		if (isFunction(model)) {
-			// TODO REFACTOR - BUG GENERATED SAME VALUES
-			this.addRules(this.createRulesByEntries(model(this.faker)));
+			this.addRule({
+				valueFunction: model,
+			});
 			return this;
 		}
 		const clone = cloneDeep(model);
@@ -103,8 +104,9 @@ export class Builder<T> {
 	public addSet(name: string, dataSet: (faker: Faker) => Partial<T>): Builder<T>;
 	public addSet(name: string, dataSet: Partial<T> | ((faker: Faker) => Partial<T>)): Builder<T> {
 		if (isFunction(dataSet)) {
-			// TODO REFACTOR - BUG GENERATED SAME VALUES
-			this.addRuleSets(name.toLowerCase(), this.createRulesByEntries(dataSet(this.faker)));
+			this.addRuleSet(name.toLowerCase(), {
+				valueFunction: dataSet,
+			});
 			return this;
 		}
 
@@ -252,7 +254,6 @@ export class Builder<T> {
 			return {
 				valueFunction: rule.valueFunction,
 				property: rule.property,
-				value: rule.valueFunction(builder.faker),
 			};
 		});
 
@@ -261,7 +262,6 @@ export class Builder<T> {
 				return {
 					valueFunction: rule.valueFunction,
 					property: rule.property,
-					value: rule.valueFunction(builder.faker),
 				};
 			});
 			builder.addRuleSets(key, clonedRulesSets);
@@ -284,14 +284,14 @@ export class Builder<T> {
 		this.rules.push(rule);
 	}
 
-	private addRules(rules: Rule<T, keyof T>[]): void {
-		this.rules.push(...rules);
-	}
-
 	private addRuleSets(name: string, rules: Array<Rule<T, keyof T>>): void {
 		if (this.rulesSets.has(name))
 			throw new Error('An item with the same key has already been added');
 		this.rulesSets.set(name, rules);
+	}
+
+	private addRuleSet(name: string, rule: Rule<T, keyof T>): void {
+		this.addRuleSets(name, [rule]);
 	}
 
 	private createRules<T, P extends keyof T>(
@@ -301,7 +301,6 @@ export class Builder<T> {
 		return {
 			valueFunction: valueFunction,
 			property: property,
-			value: valueFunction(),
 		};
 	}
 
@@ -311,10 +310,19 @@ export class Builder<T> {
 				rules,
 				(prev: T, curr: Rule<T, keyof T>): T => ({
 					...prev,
-					[curr.property]: curr.valueFunction(this.faker),
+					...this.propertyOrObject(curr),
 				}),
 				{} as T
 			);
+	}
+
+	private propertyOrObject(
+		rule: Rule<T, keyof T>
+	): { [x: string]: Partial<T> | T[keyof T] } | Partial<T> | T[keyof T] {
+		if (rule.property) {
+			return { [rule.property]: rule.valueFunction(this.faker) };
+		}
+		return { ...rule.valueFunction(this.faker) };
 	}
 
 	private createRulesWithFaker<T, P extends keyof T>(
@@ -324,7 +332,6 @@ export class Builder<T> {
 		return {
 			valueFunction: valueFunction,
 			property: property,
-			value: valueFunction(this.faker),
 		};
 	}
 
@@ -335,7 +342,6 @@ export class Builder<T> {
 			const rule: Rule<T, keyof T> = {
 				valueFunction: () => value,
 				property: property,
-				value: value,
 			};
 			rules.push(rule);
 		}

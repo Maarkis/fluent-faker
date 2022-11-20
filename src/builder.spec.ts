@@ -1,5 +1,7 @@
 import { Builder } from './builder';
-import { faker } from '@faker-js/faker';
+import { Faker, faker as fakerJs } from '@faker-js/faker';
+
+jest.useFakeTimers();
 
 interface People {
 	id: number;
@@ -42,8 +44,18 @@ const cloneName = Builder.prototype.clone.name;
 
 describe(`Suite test ${Builder.name}`, () => {
 	let sut: Builder<People>;
+	let faker: Faker;
+	let seed: number;
 	beforeEach(() => {
 		sut = new Builder<People>();
+
+		const locales = fakerJs.locales;
+		faker = new Faker({
+			locales: locales,
+		});
+
+		const localSeed = faker.datatype.number({ min: 1, max: 10000 });
+		seed = faker.seed(localSeed);
 	});
 
 	it(`should create ${Builder.name}`, () => {
@@ -96,9 +108,6 @@ describe(`Suite test ${Builder.name}`, () => {
 	});
 
 	it(`${addModelName} should build a complex configuration using Faker`, () => {
-		jest.useFakeTimers();
-		const seed = faker.datatype.number({ min: 1, max: 999 });
-		faker.seed(seed);
 		sut.useSeed(seed);
 		const valueExpected = {
 			name: faker.name.firstName(),
@@ -107,15 +116,15 @@ describe(`Suite test ${Builder.name}`, () => {
 			birthday: faker.date.past(100),
 		};
 		const value = sut
-			.addModel((faker) => ({
-				name: faker.name.firstName(),
-				lastName: faker.name.lastName(),
-				age: faker.datatype.number({ min: 1, max: 99 }),
-				birthday: faker.date.past(100),
+			.addModel((f) => ({
+				name: f.name.firstName(),
+				lastName: f.name.lastName(),
+				age: f.datatype.number({ min: 1, max: 99 }),
+				birthday: f.date.past(100),
 			}))
 			.generate();
 
-		expect(value).toStrictEqual(valueExpected);
+		expect(value).toStrictEqual({ ...valueExpected });
 	});
 
 	it(`${ruleForName} should configure a rule for a string property`, () => {
@@ -260,20 +269,25 @@ describe(`Suite test ${Builder.name}`, () => {
 	});
 
 	it(`${useSetName} should build object instance from set configuration using Faker`, () => {
-		const seed = faker.datatype.number({ min: 1, max: 999 });
 		faker.seed(seed);
 		sut.useSeed(seed);
-		const valueExpected = {
-			name: faker.name.firstName(),
-			lastName: faker.name.lastName(),
-		};
+		const valueExpected = [
+			{
+				name: faker.name.firstName(),
+				lastName: faker.name.lastName(),
+			},
+			{
+				name: faker.name.firstName(),
+				lastName: faker.name.lastName(),
+			},
+		];
 		const value = sut
 			.addSet('any set', (faker) => ({
 				name: faker.name.firstName(),
 				lastName: faker.name.lastName(),
 			}))
 			.useSet('any set')
-			.generate();
+			.generate(2);
 
 		expect(value).toStrictEqual(valueExpected);
 	});
@@ -329,7 +343,7 @@ describe(`Suite test ${Builder.name}`, () => {
 
 	it(`${cloneName} should generate a ${className} that generates the same values when using the same seed`, () => {
 		const builderToBeCloned = new Builder<People>('pt_BR');
-		builderToBeCloned.useSeed(123);
+		builderToBeCloned.useSeed(seed);
 		builderToBeCloned
 			.addSet('people', { id: 1, name: 'name', lastName: 'lastName' })
 			.ruleFor('active', true)
