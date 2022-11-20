@@ -1,5 +1,6 @@
 # Fluent-Faker
-
+[![CI](https://github.com/Maarkis/fluent-faker/actions/workflows/ci.yml/badge.svg)](https://github.com/Maarkis/fluent-faker/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/Maarkis/fluent-faker/branch/main/graph/badge.svg?token=5EEBKP7XZQ)](https://codecov.io/gh/Maarkis/fluent-faker)
 ## Overview
 
 ### A library for generating data in a simple way for testing
