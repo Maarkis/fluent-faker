@@ -1,8 +1,11 @@
 # Fluent-Faker
 
-# Getting Started
-
 ## Overview
+
+### A library for generating data in a simple way for testing
+###### [Faker](https://fakerjs.dev/) is used for fake data generation
+
+# Getting Started
 
 ## Install
 
@@ -286,8 +289,6 @@ new Builder<Todo>()
 
 ### clone
 
-**Parameters:**
-
 **Description:**
 Clone hte internal state into a new so that both are isolated from each other
 
@@ -309,7 +310,8 @@ new Builder<Todo>().clone()
 |----------|----------|----------------------------------|:--------:|----------------------------------------------------------------|
 | _length_ | `number` | The number of instances to spawn |    no    | If you don't pass a length, only one entity will be generated. |
 
-Returns: `T` instance
+Returns: `T` instance or collection of `T`
+
 
 Usage:
 
