@@ -4,39 +4,39 @@
 name: CI
 
 on:
-  - push
-  - pull_request
+    - push
+    - pull_request
 
 jobs:
-  build:
-    name: Node.js ${{ matrix.node-version }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        node-version: [ 14.x, 16.x, 18.x, 20.x ]
-        # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
-    steps:
-      - uses: actions/checkout@v3
-      - name: Install pnpm
-        uses: pnpm/action-setup@v2
-        with:
-          version: latest
-          run_install: |
-            - recursive: true
-              args: [--frozen-lockfile]
-      - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node-version }}
-          cache: 'pnpm'
-      - name: Run test
-        run: pnpm test
-      - name: Collect Coverage
-        run: pnpm coverage
-        if: ${{ matrix.node-version == '16.x' }}
-      - name: Coverage to Codecov
-        uses: codecov/codecov-action@v3.1.1
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-        if: ${{ matrix.node-version == '16.x' }}
+    build:
+        name: Node.js ${{ matrix.node-version }}
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                node-version: [14.x, 16.x, 18.x, 20.x]
+                # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
+        steps:
+            - uses: actions/checkout@v3
+            - name: Install pnpm
+              uses: pnpm/action-setup@v2
+              with:
+                  version: 7
+                  run_install: |
+                      - recursive: true
+                        args: [--frozen-lockfile]
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v3
+              with:
+                  node-version: ${{ matrix.node-version }}
+                  cache: 'pnpm'
+            - name: Run test
+              run: pnpm test
+            - name: Collect Coverage
+              run: pnpm coverage
+              if: ${{ matrix.node-version == '16.x' }}
+            - name: Coverage to Codecov
+              uses: codecov/codecov-action@v3.1.1
+              with:
+                  token: ${{ secrets.CODECOV_TOKEN }}
+              if: ${{ matrix.node-version == '16.x' }}
