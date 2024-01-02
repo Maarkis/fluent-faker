@@ -1,3 +1,10 @@
+# [0.2.0](https://github.com/Maarkis/fluent-faker/compare/v0.1.0...v0.2.0) (2024-01-02)
+
+
+### Features
+
+* contract ([3733aab](https://github.com/Maarkis/fluent-faker/commit/3733aabac641daf2b534a9482289d76fbb707003))
+
 # [0.1.0](https://github.com/Maarkis/fluent-faker/compare/v0.0.12...v0.1.0) (2024-01-02)
 
 
