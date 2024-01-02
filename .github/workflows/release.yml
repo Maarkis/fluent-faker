@@ -43,6 +43,9 @@ jobs:
       - name: Verify integrity
         run: pnpm audit --prod
 
+      - name: Build
+        run: pnpm build
+
       - name: Release
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
