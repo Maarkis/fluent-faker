@@ -3,21 +3,14 @@ import reduce from 'lodash.reduce';
 import isFunction from 'lodash.isfunction';
 import cloneDeep from 'lodash.clonedeep';
 import { Locale, getLocale } from './locale';
-
-type ValueFunction<T, P extends keyof T> = (faker: Faker) => T[P];
-type EntityFunction<T> = (faker: Faker) => Partial<T>;
-
-interface Rule<T, P extends keyof T> {
-	property?: P | string;
-	valueFunction: EntityFunction<T> | ValueFunction<T, keyof T>;
-}
+import { Rule } from './rule';
 
 export class Builder<T> {
 	private rules: Rule<T, keyof T>[] = [];
 	private rulesSets: Map<string, Rule<T, keyof T>[]> = new Map<string, Rule<T, keyof T>[]>();
 	private rulesSetsFactoryFunction: [useSet: boolean, factoryFunction?: () => T] = [false];
 
-	private localLocale: Locale;
+	private readonly _locale: Locale;
 
 	/**
 	 * The local seed of Faker if available. Null local seed means the Global property is being used.
@@ -39,8 +32,8 @@ export class Builder<T> {
 	 * @return new instance of Builder
 	 */
 	constructor(locale?: string) {
-		this.localLocale = getLocale(locale);
-		this.faker = new Faker({ locale: this.localLocale.locale });
+		this._locale = getLocale(locale);
+		this.faker = new Faker({ locale: this._locale.locale });
 	}
 
 	/**
@@ -194,12 +187,12 @@ export class Builder<T> {
 		const factoryFunction =
 			useSet && rulesSetsFactoryFunction
 				? () => ({
-						...rulesSetsFactoryFunction(),
-						...rulesFactoryFunction(),
-					})
+					...rulesSetsFactoryFunction(),
+					...rulesFactoryFunction(),
+				})
 				: () => ({
-						...rulesFactoryFunction(),
-					});
+					...rulesFactoryFunction(),
+				});
 
 		return length || length == 0
 			? this.buildWithQuantity(length, factoryFunction)
@@ -214,7 +207,7 @@ export class Builder<T> {
 	 * 	@return {string} locale string
 	 */
 	public get locale(): string {
-		return this.localLocale.code;
+		return this._locale.code;
 	}
 
 	/**
