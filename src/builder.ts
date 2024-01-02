@@ -1,9 +1,8 @@
-import { Faker, faker as FakerJs } from '@faker-js/faker';
+import { Faker } from '@faker-js/faker';
 import reduce from 'lodash.reduce';
 import isFunction from 'lodash.isfunction';
 import cloneDeep from 'lodash.clonedeep';
-
-const locales = FakerJs.locales;
+import { Locale, getLocale } from './locale';
 
 type ValueFunction<T, P extends keyof T> = (faker: Faker) => T[P];
 type EntityFunction<T> = (faker: Faker) => Partial<T>;
@@ -18,7 +17,7 @@ export class Builder<T> {
 	private rulesSets: Map<string, Rule<T, keyof T>[]> = new Map<string, Rule<T, keyof T>[]>();
 	private rulesSetsFactoryFunction: [useSet: boolean, factoryFunction?: () => T] = [false];
 
-	private localLocale = 'en';
+	private localLocale: Locale;
 
 	/**
 	 * The local seed of Faker if available. Null local seed means the Global property is being used.
@@ -30,7 +29,7 @@ export class Builder<T> {
 	 * The internal Faker object that is used in (faker) => faker rules.
 	 * @private faker
 	 */
-	private readonly faker: Faker;
+	private faker: Faker;
 
 	/**
 	 * Create Builder
@@ -40,8 +39,8 @@ export class Builder<T> {
 	 * @return new instance of Builder
 	 */
 	constructor(locale?: string) {
-		this.faker = new Faker({ locales });
-		this.setLocale(locale ?? this.localLocale);
+		this.localLocale = getLocale(locale);
+		this.faker = new Faker({ locale: this.localLocale.locale });
 	}
 
 	/**
@@ -50,7 +49,7 @@ export class Builder<T> {
 	 * @example
 	 * 		new Builder<People>().addModel({
 	 * 			name: 'person name',
-	 * 			lastName: 'person lastname'
+	 * 			lastName: 'person last name'
 	 * 		})
 	 * @return instance of Builder
 	 */
@@ -85,7 +84,7 @@ export class Builder<T> {
 	 * @example
 	 * 		new Builder<People>().addSet('good person', {
 	 * 			name: 'good person name',
-	 * 			lastName: 'good person lastname'
+	 * 			lastName: 'good person last name'
 	 * 		})
 	 * @return instance of Builder
 	 */
@@ -137,11 +136,11 @@ export class Builder<T> {
 	public ruleFor<P extends keyof T>(property: P, valueFunction: T[P]): Builder<T>;
 	public ruleFor<P extends keyof T>(
 		property: P,
-		valueFunction: (faker: Faker) => T[P]
+		valueFunction: (faker: Faker) => T[P],
 	): Builder<T>;
 	public ruleFor<P extends keyof T>(
 		property: P,
-		valueFunction: T[P] | ((faker: Faker) => T[P])
+		valueFunction: T[P] | ((faker: Faker) => T[P]),
 	): Builder<T> {
 		if (isFunction(valueFunction)) {
 			this.addRule(this.createRulesWithFaker(property, valueFunction));
@@ -197,10 +196,10 @@ export class Builder<T> {
 				? () => ({
 						...rulesSetsFactoryFunction(),
 						...rulesFactoryFunction(),
-				  })
+					})
 				: () => ({
 						...rulesFactoryFunction(),
-				  });
+					});
 
 		return length || length == 0
 			? this.buildWithQuantity(length, factoryFunction)
@@ -208,25 +207,14 @@ export class Builder<T> {
 	}
 
 	/**
-	 * Set Faker's locale
-	 * @param locale The locale to set (e.g. `en` or `pt_BR`).
-	 * @example
-	 * 		new Builder<People>().setLocale('pt_BR')
-	 */
-	public setLocale(locale: string): void {
-		this.faker.setLocale(locale);
-		this.localLocale = locale;
-	}
-
-	/**
 	 * Get the current locale.
 	 * @example
 	 * 		new Builder<People>().locale
 	 * 		// return 'pt_BR'
-	 * 	@return locale string
+	 * 	@return {string} locale string
 	 */
 	public get locale(): string {
-		return this.localLocale;
+		return this.localLocale.code;
 	}
 
 	/**
@@ -247,7 +235,7 @@ export class Builder<T> {
 	 * @return  new Builder instance with cloned builder configuration
 	 */
 	public clone(): Builder<T> {
-		const builder = new Builder<T>(this.localLocale);
+		const builder = new Builder<T>();
 		if (this.localSeed) builder.useSeed(this.localSeed);
 
 		builder.rules = this.rules.map<Rule<T, keyof T>>((rule: Rule<T, keyof T>) => {
@@ -296,7 +284,7 @@ export class Builder<T> {
 
 	private createRules<T, P extends keyof T>(
 		property: P | string,
-		valueFunction: () => T[P]
+		valueFunction: () => T[P],
 	): Rule<T, P> {
 		return {
 			valueFunction: valueFunction,
@@ -312,12 +300,12 @@ export class Builder<T> {
 					...prev,
 					...this.propertyOrObject(curr),
 				}),
-				{} as T
+				{} as T,
 			);
 	}
 
 	private propertyOrObject(
-		rule: Rule<T, keyof T>
+		rule: Rule<T, keyof T>,
 	): { [x: string]: Partial<T> | T[keyof T] } | Partial<T> | T[keyof T] {
 		if (rule.property) {
 			return { [rule.property]: rule.valueFunction(this.faker) };
@@ -327,7 +315,7 @@ export class Builder<T> {
 
 	private createRulesWithFaker<T, P extends keyof T>(
 		property: P,
-		valueFunction: (faker: Faker) => T[P]
+		valueFunction: (faker: Faker) => T[P],
 	): Rule<T, P> {
 		return {
 			valueFunction: valueFunction,

@@ -48,7 +48,7 @@ export function createBuilder<T>(model: Partial<T>, locale: string): Builder<T>;
 export function createBuilder<T>(model: (faker: Faker) => Partial<T>, locale: string): Builder<T>;
 export function createBuilder<T>(
 	model?: Partial<T> | ((faker: Faker) => Partial<T>),
-	locale?: string
+	locale?: string,
 ): Builder<T> {
 	if (isFunction(model)) return new Builder<T>(locale).addModel(model);
 
@@ -61,16 +61,6 @@ export function generate<T>(model: (faker: Faker) => Partial<T>, length: number)
 export function generate<T>(model: Partial<T>, length: number): Array<T>;
 export function generate<T>(model: Partial<T>, length?: number): T | Array<T> {
 	return new Builder<T>().addModel(model).generate(length);
-}
-
-/**
- * Set global Faker's locale
- * @param locale The locale to set (e.g. `en` or `pt_BR`).
- * @example
- * 		setLocale('pt_BR')
- */
-export function setLocale(locale: string): void {
-	faker.setLocale(locale);
 }
 
 /**

@@ -6,5 +6,5 @@
   "endOfLine": "crlf",
   "tabWidth": 4,
   "useTabs": true,
-  "arrowParens": "always"
+  "arrowParents": "always"
 }

@@ -48,7 +48,7 @@ createBuilder<Todo>({id: 1, name: 'Todo 1'}).generate() // { id: 1, name: 'Todo 
 // using faker
 createBuilder<Todo>((faker) = (
     {
-        id: faker.datatype.number(),
+        id: faker.number.int(),
         name: faker.lorem.word()
     }))
     .generate() // { id: 654, name: 'eaque' }
@@ -67,34 +67,14 @@ generate<Todo>({id: 1, name: 'Todo 1'}, 2)
 
 ## Switching locales
 
-By default fluent-faker uses Faker.js default locale
+By default, fluent-faker uses the default locale of Faker.js (en) when constructing new instances of the Builder.
 
-Although you can change locale with `setLocale` function, both in `Builder` and global
-
-### Global:
-
-```ts
-import {setLocale} from '@maarkis/fluent-faker'
-
-setLocale('pt_BR')
-```
-
-global scope, values modify Faker.js lib
-
-### Local:
+You can change the locale by providing the locale parameter during the construction of the Builder class.
 
 ```ts
 import {Builder} from '@maarkis/fluent-faker'
 
 new Builder<Todo>('pt_BR')
-```
-
-or
-
-```ts
-import {Builder} from '@maarkis/fluent-faker'
-
-new Builder<People>().setLocale('pt_BR')
 ```
 
 ###### Check [Available locales](https://fakerjs.dev/guide/localization.html#available-locales) in Faker.js documentation.
@@ -154,7 +134,7 @@ or
 import {createBuilder} from "@maarkis/fluent-faker";
 
 createBuilder<Todo>((faker) => ({
-    id: faker.datatype.number(),
+    id: faker.number.int(),
     name: 'Todo 1'
 }))
 ```
@@ -191,7 +171,7 @@ or
 import {generate} from "@maarkis/fluent-faker";
 
 generate<Todo>((faker) => ({
-    id: faker.datatype.number(),
+    id: faker.number.int(),
     name: 'Todo 1'
 })) // { id: 8874, name: 'Todo 1' }
 ```
@@ -200,7 +180,7 @@ or
 import {generate} from "@maarkis/fluent-faker";
 
 generate<Todo>((faker) => ({
-    id: faker.datatype.number(),
+    id: faker.number.int(),
     name: 'Todo 1'
 }), 2) // [{ id: 8874, name: 'Todo 1' },{ id: 97856, name: 'Todo 1' }]
 ```
@@ -230,7 +210,7 @@ or
 ```ts
 new Builder<Todo>()
     .addModel((faker) => ({
-        id: faker.datatype.number(),
+        id: faker.number.int(),
         name: 'Todo 1'
     }))
     .generate() // { id: 9763, name: 'Todo 1' }
@@ -263,7 +243,7 @@ or
 ```ts
 new Builder<Todo>()
     .addSet('todo done', (faker) => ({
-        id: faker.datatype.number(),
+        id: faker.number.int(),
         name: 'Todo 1',
         done: true
     }))
@@ -348,26 +328,8 @@ or
 
 ```ts
 new Builder<Todo>()
-    .ruleFor('id', (faker) => faker.datatype.number())
+    .ruleFor('id', (faker) => faker.number.int())
     .generate() // { id: 1564 }
-```
-
----
-
-### setLocale
-
-**Parameters:**
-
-| Name     | Type     | Description       | required |
-|----------|----------|-------------------|:--------:|
-| _locale_ | `string` | The locale to set |   yes    |
-
-Returns: `void`
-
-Usage:
-
-```ts
-new Builder<Todo>().setLocale('pt_BR')
 ```
 
 ---
@@ -413,7 +375,7 @@ or
 ```ts
 new Builder<Todo>()
     .addSet('todo done', (faker) => ({
-        id: faker.datatype.number(),
+        id: faker.number.int(),
         name: 'Todo 1',
         done: true
     }))

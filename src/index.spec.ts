@@ -1,22 +1,14 @@
-﻿import { Builder, createBuilder, generate, setLocale, useSeed } from './index';
+﻿import { Builder, createBuilder, generate, useSeed } from './index';
 import { faker } from '@faker-js/faker';
 
 describe('Suite test Index', () => {
-	it(`${setLocale.name} should set global locale`, () => {
-		const spyOnLocale = jest.spyOn(faker, 'setLocale');
-
-		setLocale('pt_BR');
-
-		expect(spyOnLocale).toBeCalledWith('pt_BR');
-	});
-
 	it(`${useSeed.name} should set global seed`, () => {
 		const spyOnSeed = jest.spyOn(faker, 'seed');
-		const seedExpected = faker.datatype.number();
+		const seedExpected = faker.number.int();
 
 		const seed = useSeed(seedExpected);
 
-		expect(spyOnSeed).toBeCalledWith(seedExpected);
+		expect(spyOnSeed).toHaveBeenCalledWith(seedExpected);
 		expect(seed).toBe(seedExpected);
 	});
 

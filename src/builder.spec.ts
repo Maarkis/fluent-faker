@@ -1,7 +1,9 @@
 import { Builder } from './builder';
-import { Faker, faker as fakerJs } from '@faker-js/faker';
+import { Faker, en } from '@faker-js/faker';
 
 jest.useFakeTimers();
+
+const localeEn = en;
 
 interface People {
 	id: number;
@@ -36,7 +38,6 @@ const className = Builder.name;
 const addModelName = Builder.prototype.addModel.name;
 const ruleForName = Builder.prototype.ruleFor.name;
 const generateName = Builder.prototype.generate.name;
-const setLocaleName = Builder.prototype.setLocale.name;
 const seedName = Builder.prototype.useSeed.name;
 const addSetName = Builder.prototype.addSet.name;
 const useSetName = Builder.prototype.useSet.name;
@@ -49,12 +50,9 @@ describe(`Suite test ${Builder.name}`, () => {
 	beforeEach(() => {
 		sut = new Builder<People>();
 
-		const locales = fakerJs.locales;
-		faker = new Faker({
-			locales: locales,
-		});
+		faker = new Faker({ locale: [localeEn] });
 
-		const localSeed = faker.datatype.number({ min: 1, max: 10000 });
+		const localSeed = faker.number.int({ min: 1, max: 10000 });
 		seed = faker.seed(localSeed);
 	});
 
@@ -72,12 +70,6 @@ describe(`Suite test ${Builder.name}`, () => {
 		const builder = new Builder<People>('pt_BR');
 
 		expect(builder.locale).toStrictEqual('pt_BR');
-	});
-
-	it(`${setLocaleName} should set locale correctly`, () => {
-		sut.setLocale('pt_BR');
-
-		expect(sut.locale).toStrictEqual('pt_BR');
 	});
 
 	it(`${seedName} should set seed correctly`, () => {
@@ -110,17 +102,17 @@ describe(`Suite test ${Builder.name}`, () => {
 	it(`${addModelName} should build a complex configuration using Faker`, () => {
 		sut.useSeed(seed);
 		const valueExpected = {
-			name: faker.name.firstName(),
-			lastName: faker.name.lastName(),
-			age: faker.datatype.number({ min: 1, max: 99 }),
-			birthday: faker.date.past(100),
+			name: faker.person.firstName(),
+			lastName: faker.person.lastName(),
+			age: faker.number.int({ min: 1, max: 99 }),
+			birthday: faker.date.past({ years: 100 }),
 		};
 		const value = sut
 			.addModel((f) => ({
-				name: f.name.firstName(),
-				lastName: f.name.lastName(),
-				age: f.datatype.number({ min: 1, max: 99 }),
-				birthday: f.date.past(100),
+				name: f.person.firstName(),
+				lastName: f.person.lastName(),
+				age: f.number.int({ min: 1, max: 99 }),
+				birthday: f.date.past({ years: 100 }),
 			}))
 			.generate();
 
@@ -218,7 +210,7 @@ describe(`Suite test ${Builder.name}`, () => {
 			const value = () => sut.addModel(model).generate(length);
 
 			expect(value).toThrow('property length be greater than greater than or equal to 0.');
-		}
+		},
 	);
 
 	it(`${generateName} should generate multiple instance`, () => {
@@ -273,18 +265,18 @@ describe(`Suite test ${Builder.name}`, () => {
 		sut.useSeed(seed);
 		const valueExpected = [
 			{
-				name: faker.name.firstName(),
-				lastName: faker.name.lastName(),
+				name: faker.person.firstName(),
+				lastName: faker.person.lastName(),
 			},
 			{
-				name: faker.name.firstName(),
-				lastName: faker.name.lastName(),
+				name: faker.person.firstName(),
+				lastName: faker.person.lastName(),
 			},
 		];
 		const value = sut
 			.addSet('any set', (faker) => ({
-				name: faker.name.firstName(),
-				lastName: faker.name.lastName(),
+				name: faker.person.firstName(),
+				lastName: faker.person.lastName(),
 			}))
 			.useSet('any set')
 			.generate(2);
@@ -348,7 +340,7 @@ describe(`Suite test ${Builder.name}`, () => {
 			.addSet('people', { id: 1, name: 'name', lastName: 'lastName' })
 			.ruleFor('active', true)
 			.ruleFor('gender', () => Gender.Male)
-			.ruleFor('id', (faker) => faker.datatype.number());
+			.ruleFor('id', (faker) => faker.number.int());
 		const clonedBuilder = builderToBeCloned.clone();
 
 		const valueExpected = builderToBeCloned.generate();
