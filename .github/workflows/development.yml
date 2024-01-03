@@ -1,11 +1,20 @@
 # This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
 
-name: CI
+# This workflow will do a clean installation of node dependencies, cache/restore them, build the source code and run tests across different versions of node
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-nodejs
+
+name: Development
 
 on:
-  - push
-  - pull_request
+    pull_request:
+      types:
+        - opened
+        - edited
+        - synchronize
+        - reopened
+    push:
+    workflow_call:
 
 jobs:
   build:
@@ -17,25 +26,32 @@ jobs:
         node-version: [ 16.x, 18.x, 20.x ]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
     steps:
-      - uses: actions/checkout@v3
-      - name: Install pnpm
+
+      - name: "☁️ Checkout repository"
+        uses: actions/checkout@v3
+
+      - name: "📦 Install pnpm"
         uses: pnpm/action-setup@v2
         with:
           version: latest
           run_install: |
             - recursive: true
               args: [--frozen-lockfile]
-      - name: Use Node.js ${{ matrix.node-version }}
+
+      - name: "🔧 Use Node.js ${{ matrix.node-version }}"
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
           cache: 'pnpm'
-      - name: Run test
+
+      - name: "🧪 Run test"
         run: pnpm test
-      - name: Collect Coverage
+
+      - name: "☂️ Collect Coverage"
         run: pnpm coverage
         if: ${{ matrix.node-version == '16.x' }}
-      - name: Coverage to Codecov
+
+      - name: "☂️ Coverage to Codecov"
         uses: codecov/codecov-action@v3.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
