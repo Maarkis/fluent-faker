@@ -10,15 +10,18 @@ permissions:
     contents: read
 
 jobs:
+  test:
+    uses: maarkis/fluent-faker/.github/workflows/development.yml@main
+
   release:
     name: Release
+    needs: test
     runs-on: ubuntu-latest
     permissions:
         contents: write
         issues: write
         pull-requests: write
         id-token: write
-
 
     steps:
       - name: Checkout code
