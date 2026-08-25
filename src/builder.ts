@@ -118,7 +118,8 @@ export class Builder<T> {
 
 	/**
 	 * Uses a set of predefined rules
-	 * @param name The set name
+	 * @param name The set name, matched case-insensitively
+	 * @throws {Error} When no set was registered under that name
 	 * @example
 	 * 		new Builder<People>()
 	 * 			.addSet('good person', { name: 'good person name' })
@@ -128,7 +129,15 @@ export class Builder<T> {
 	public useSet(name: string): Builder<T> {
 		const rulesSet = this.rulesSets.get(name.toLowerCase());
 		if (!rulesSet) {
-			return this;
+			const known = [...this.rulesSets.keys()];
+			throw new Error(
+				`Unknown set: '${name}'. ` +
+					(known.length
+						? `Defined sets are: ${known
+								.map((key: string): string => `'${key}'`)
+								.join(', ')}.`
+						: 'No sets were defined on this builder.'),
+			);
 		}
 
 		// Traits stack in activation order; a later set wins over an earlier one.
