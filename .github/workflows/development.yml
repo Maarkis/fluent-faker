@@ -50,6 +50,9 @@ jobs:
       - name: "🏗️ Build"
         run: pnpm build
 
+      - name: "🔎 Check type-level expectations"
+        run: pnpm check:types
+
       - name: "🧪 Run test"
         run: pnpm test
 

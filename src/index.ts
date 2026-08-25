@@ -19,7 +19,7 @@ export function createBuilder<T>(): Builder<T>;
  * 		}))
  * @return new instance of Builder with presets
  */
-export function createBuilder<T>(model: (faker: Faker) => Partial<T>): Builder<T>;
+export function createBuilder<T>(model: (faker: Faker) => Partial<T>): Builder<T, keyof T>;
 /**
  * Create a new instance of Builder
  * @param model Initial setup for the builder
@@ -27,7 +27,7 @@ export function createBuilder<T>(model: (faker: Faker) => Partial<T>): Builder<T
  * 		createBuilder<{ name: string }>({ name: 'person name' })
  * @return new instance of Builder with presets
  */
-export function createBuilder<T>(model: Partial<T>): Builder<T>;
+export function createBuilder<T>(model: Partial<T>): Builder<T, keyof T>;
 
 /**
  * Create a new instance of Builder
@@ -37,7 +37,7 @@ export function createBuilder<T>(model: Partial<T>): Builder<T>;
  * 		createBuilder<{ name: string }>({ name: 'person name' }, 'pt_BR')
  * @return new instance of Builder with presets
  */
-export function createBuilder<T>(model: Partial<T>, locale: string): Builder<T>;
+export function createBuilder<T>(model: Partial<T>, locale: string): Builder<T, keyof T>;
 /**
  * Create a new instance of Builder
  * @param model Initial setup for the builder
@@ -46,7 +46,10 @@ export function createBuilder<T>(model: Partial<T>, locale: string): Builder<T>;
  * 		createBuilder<{ name: string }>((faker) => ({ name: faker.person.firstName() }), 'pt_BR')
  * @return new instance of Builder with presets
  */
-export function createBuilder<T>(model: (faker: Faker) => Partial<T>, locale: string): Builder<T>;
+export function createBuilder<T>(
+	model: (faker: Faker) => Partial<T>,
+	locale: string,
+): Builder<T, keyof T>;
 export function createBuilder<T>(
 	model?: Partial<T> | ((faker: Faker) => Partial<T>),
 	locale?: string,
@@ -87,4 +90,46 @@ export { Builder, MAX_GENERATE_LENGTH };
  */
 export function clearSeed(): void {
 	clearGlobalSeed();
+}
+
+/**
+ * A model accepted by {@link createFactory}: a partial object, or a function
+ * that receives a Faker instance and returns one.
+ */
+export type Model<T> = Partial<T> | ((faker: Faker) => Partial<T>);
+
+/**
+ * The properties a given model fills, extracted from the model's own type.
+ */
+export type FilledBy<T, M> = M extends (faker: Faker) => infer R
+	? keyof R & keyof T
+	: keyof M & keyof T;
+
+/**
+ * Creates a Builder that tracks which properties it can actually fill, so
+ * `generate()` returns that shape instead of claiming a complete `T`.
+ *
+ * Called in two steps because TypeScript has no partial type argument
+ * inference: naming `T` explicitly in a single call would stop the model type
+ * from being inferred. The first call fixes `T`, the second infers the model.
+ *
+ * @example
+ * 		const todo = createFactory<Todo>()({ id: 1 }).generate()
+ * 		// todo: Pick<Todo, 'id'> - assigning it to a Todo is a compile error
+ * @example
+ * 		const todo = createFactory<Todo>()({ id: 1 })
+ * 			.ruleFor('name', 'Todo 1')
+ * 			.ruleFor('done', false)
+ * 			.generate()
+ * 		// todo: Todo - every property is accounted for
+ * @return A function that takes the model and an optional locale
+ */
+export function createFactory<T>(): <M extends Model<T>>(
+	model: M,
+	locale?: string,
+) => Builder<T, FilledBy<T, M>> {
+	return <M extends Model<T>>(model: M, locale?: string): Builder<T, FilledBy<T, M>> => {
+		const builder = new Builder<T, FilledBy<T, M>>(locale);
+		return builder.addModel(model as Partial<T>) as unknown as Builder<T, FilledBy<T, M>>;
+	};
 }

@@ -11,7 +11,14 @@ import { getGlobalSeed } from './seed';
  */
 export const MAX_GENERATE_LENGTH = 1_000_000;
 
-export class Builder<T> {
+/**
+ * Tracks which properties a Builder has been told how to fill, so `generate()`
+ * can return the shape that was actually built instead of claiming a full `T`.
+ *
+ * The parameter defaults to `keyof T`, which is the permissive, pre-existing
+ * behaviour. Precision is opt-in through `createFactory`.
+ */
+export class Builder<T, Filled extends keyof T = keyof T> {
 	/** Layer 1 - factory defaults, set through addModel. */
 	private modelRules: Rule<T, keyof T>[] = [];
 
@@ -64,7 +71,7 @@ export class Builder<T> {
 	 * 		})
 	 * @return instance of Builder
 	 */
-	public addModel(model: Partial<T>): Builder<T>;
+	public addModel<M extends Partial<T>>(model: M): Builder<T, Filled | (keyof M & keyof T)>;
 	/**
 	 * Defines a set of rules under a specific name. Useful for defining rules for special cases
 	 * @param model The dataset to apply when the set is specified, presets are not stored
@@ -75,8 +82,10 @@ export class Builder<T> {
 	 * 		}))
 	 * @return instance of Builder
 	 */
-	public addModel(model: (faker: Faker) => Partial<T>): Builder<T>;
-	public addModel(model: Partial<T> | ((faker: Faker) => Partial<T>)): Builder<T> {
+	public addModel<M extends Partial<T>>(
+		model: (faker: Faker) => M,
+	): Builder<T, Filled | (keyof M & keyof T)>;
+	public addModel(model: Partial<T> | ((faker: Faker) => Partial<T>)): Builder<T, Filled> {
 		if (isFunction(model)) {
 			this.modelRules.push({ valueFunction: model });
 			return this;
@@ -97,7 +106,7 @@ export class Builder<T> {
 	 * 		})
 	 * @return instance of Builder
 	 */
-	public addSet(name: string, dataSet: Partial<T>): Builder<T>;
+	public addSet(name: string, dataSet: Partial<T>): Builder<T, Filled>;
 	/**
 	 * Defines a set of rules under a specific name. Useful for defining rules for special cases
 	 * @param name  The set name
@@ -109,8 +118,11 @@ export class Builder<T> {
 	 * 		}))
 	 * @return instance of Builder
 	 */
-	public addSet(name: string, dataSet: (faker: Faker) => Partial<T>): Builder<T>;
-	public addSet(name: string, dataSet: Partial<T> | ((faker: Faker) => Partial<T>)): Builder<T> {
+	public addSet(name: string, dataSet: (faker: Faker) => Partial<T>): Builder<T, Filled>;
+	public addSet(
+		name: string,
+		dataSet: Partial<T> | ((faker: Faker) => Partial<T>),
+	): Builder<T, Filled> {
 		if (isFunction(dataSet)) {
 			this.addRuleSet(name.toLowerCase(), {
 				valueFunction: dataSet,
@@ -133,7 +145,7 @@ export class Builder<T> {
 	 * 			.useSet('good person')
 	 * @return instance of Builder
 	 */
-	public useSet(name: string): Builder<T> {
+	public useSet(name: string): Builder<T, keyof T> {
 		const rulesSet = this.rulesSets.get(name.toLowerCase());
 		if (!rulesSet) {
 			const known = [...this.rulesSets.keys()];
@@ -149,18 +161,22 @@ export class Builder<T> {
 
 		// Traits stack in activation order; a later set wins over an earlier one.
 		this.activeSetRules.push(...rulesSet);
-		return this;
+
+		// Runtime is untouched; only the tracked key set widens. Set contents are
+		// not carried in the type, so precision falls back to the permissive `keyof T`
+		// rather than under-reporting and causing false errors downstream.
+		return this as unknown as Builder<T, keyof T>;
 	}
 
-	public ruleFor<P extends keyof T>(property: P, valueFunction: T[P]): Builder<T>;
+	public ruleFor<P extends keyof T>(property: P, valueFunction: T[P]): Builder<T, Filled | P>;
 	public ruleFor<P extends keyof T>(
 		property: P,
 		valueFunction: (faker: Faker) => T[P],
-	): Builder<T>;
+	): Builder<T, Filled | P>;
 	public ruleFor<P extends keyof T>(
 		property: P,
 		valueFunction: T[P] | ((faker: Faker) => T[P]),
-	): Builder<T> {
+	): Builder<T, Filled> {
 		if (isFunction(valueFunction)) {
 			this.addRule(this.createRulesWithFaker(property, valueFunction));
 			return this;
@@ -177,7 +193,7 @@ export class Builder<T> {
 	 * 		return new instance of People
 	 * @return The generated instance of type {T}
 	 */
-	public generate(): T;
+	public generate(): Pick<T, Filled>;
 	/**
 	 * Generates a collection of instances of the type
 	 * @param length The number of instances to spawn
@@ -186,7 +202,7 @@ export class Builder<T> {
 	 * 		return new collection of People
 	 * @return The collection of generated instances of type {T}
 	 */
-	public generate(length: number): Array<T>;
+	public generate(length: number): Array<Pick<T, Filled>>;
 	/**
 	 * Generate an instances or collection of instances of the type
 	 * @param length The number of instances to spawn
@@ -195,7 +211,7 @@ export class Builder<T> {
 	 * 		return new collection of People
 	 * @return The collection of generated instances of type {T}
 	 */
-	public generate(length?: number): T | Array<T>;
+	public generate(length?: number): Pick<T, Filled> | Array<Pick<T, Filled>>;
 	/**
 	 * Generate an instances or collection of instances of the type
 	 * @param length The number of instances to spawn
@@ -204,7 +220,7 @@ export class Builder<T> {
 	 * 		return new collection of People
 	 * @return The collection of generated instances of type {T}
 	 */
-	public generate(length?: number): T | Array<T> {
+	public generate(length?: number): Pick<T, Filled> | Array<Pick<T, Filled>> {
 		if (length !== undefined && (!Number.isInteger(length) || length < 0))
 			throw new RangeError(
 				`length must be an integer greater than or equal to 0, received: ${length}.`,
@@ -248,7 +264,7 @@ export class Builder<T> {
 	 * 		new Builder<People>().useSeed(1)
 	 * 	@return The seed that was set
 	 */
-	public useSeed(seed: number): Builder<T> {
+	public useSeed(seed: number): Builder<T, Filled> {
 		this.localSeed = seed;
 		this.faker.seed(seed);
 		this.seeded = true;
@@ -280,8 +296,8 @@ export class Builder<T> {
 	 * 		const otherBuilder = new Builder<People>().clone()
 	 * @return  new Builder instance with cloned builder configuration
 	 */
-	public clone(): Builder<T> {
-		const builder = new Builder<T>(this._locale.code);
+	public clone(): Builder<T, Filled> {
+		const builder = new Builder<T, Filled>(this._locale.code);
 		if (this.localSeed !== undefined) builder.useSeed(this.localSeed);
 
 		const copy = (rules: Rule<T, keyof T>[]): Rule<T, keyof T>[] =>

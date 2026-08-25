@@ -33,6 +33,7 @@
     "build": "pnpm run clean:build && pnpm run build:node && pnpm run build:types",
     "build:node": "tsc -p tsconfig.json && tsc -p tsconfig-cjs.json && bash ./fixup",
     "build:types": "tsc --emitDeclarationOnly --declaration --outDir dist/types",
+    "check:types": "bash ./scripts/check-type-errors.sh",
     "check": "prettier --check \"src/**/*.ts\" && eslint --ext .js,.ts .",
     "prettier": "prettier --write \"src/**/*.ts\"",
     "test": "jest",
