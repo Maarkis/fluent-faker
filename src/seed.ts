@@ -19,3 +19,11 @@ export function setGlobalSeed(seed?: number): number {
 export function getGlobalSeed(): number | undefined {
 	return globalSeed;
 }
+
+/**
+ * Clears the global seed, returning Builders to unseeded behaviour.
+ * Useful to isolate a test that must not inherit a seed set by another.
+ */
+export function clearGlobalSeed(): void {
+	globalSeed = undefined;
+}

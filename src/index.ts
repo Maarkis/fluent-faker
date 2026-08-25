@@ -1,7 +1,7 @@
 import { Faker } from '@faker-js/faker';
-import { Builder } from './builder';
+import { Builder, MAX_GENERATE_LENGTH } from './builder';
 import { isFunction } from './internal';
-import { setGlobalSeed } from './seed';
+import { clearGlobalSeed, setGlobalSeed } from './seed';
 
 /**
  * Create a new instance of Builder
@@ -75,4 +75,16 @@ export function useSeed(seed?: number): number {
 	return setGlobalSeed(seed);
 }
 
-export { Builder };
+export { Builder, MAX_GENERATE_LENGTH };
+
+/**
+ * Clears the global seed set by {@link useSeed}.
+ *
+ * Builders created afterwards, and existing ones that have not generated yet,
+ * go back to unseeded behaviour. A Builder with its own seed is unaffected.
+ * @example
+ * 		afterEach(() => clearSeed())
+ */
+export function clearSeed(): void {
+	clearGlobalSeed();
+}

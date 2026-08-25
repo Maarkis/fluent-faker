@@ -4,6 +4,13 @@ import { Locale, getLocale } from './locale';
 import { Rule } from './rule';
 import { getGlobalSeed } from './seed';
 
+/**
+ * Upper bound for a single `generate(length)` call. A fixture run asking for
+ * more than this is almost always a typo, and failing fast beats exhausting
+ * memory. Loop over smaller batches when the size is intentional.
+ */
+export const MAX_GENERATE_LENGTH = 1_000_000;
+
 export class Builder<T> {
 	/** Layer 1 - factory defaults, set through addModel. */
 	private modelRules: Rule<T, keyof T>[] = [];
@@ -201,6 +208,12 @@ export class Builder<T> {
 		if (length !== undefined && (!Number.isInteger(length) || length < 0))
 			throw new RangeError(
 				`length must be an integer greater than or equal to 0, received: ${length}.`,
+			);
+
+		if (length !== undefined && length > MAX_GENERATE_LENGTH)
+			throw new RangeError(
+				`length must not exceed ${MAX_GENERATE_LENGTH}, received: ${length}. ` +
+					'Generate in smaller batches when this is intentional.',
 			);
 
 		this.ensureSeeded();
