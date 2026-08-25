@@ -13,19 +13,19 @@
 Install it as a Dev Dependency using your favorite package manager
 
 ```sh
-npm install @maarkis/fluent-faker --save-dev
+npm install @maarkis/fluent-faker @faker-js/faker --save-dev
 ```
 
 or
 
 ```sh
-pnpm install @maarkis/fluent-faker --save-dev
+pnpm install @maarkis/fluent-faker @faker-js/faker --save-dev
 ```
 
 or
 
 ```sh
-yarn add @maarkis/fluent-faker --dev
+yarn add @maarkis/fluent-faker @faker-js/faker --dev
 ```
 
 ## Usage
@@ -46,7 +46,7 @@ import {createBuilder} from '@maarkis/fluent-faker'
 createBuilder<Todo>({id: 1, name: 'Todo 1'}).generate() // { id: 1, name: 'Todo 1' }
 
 // using faker
-createBuilder<Todo>((faker) = (
+createBuilder<Todo>((faker) => (
     {
         id: faker.number.int(),
         name: faker.lorem.word()
@@ -97,14 +97,72 @@ import {useSeed} from '@maarkis/fluent-faker'
 useSeed(596) // 596
 ```
 
-global scope, values modify Faker.js lib
+Global scope. Every Builder that has not generated yet picks it up, including
+ones constructed before the call. A Builder with its own seed is unaffected.
+
+Call `clearSeed()` to go back to unseeded behaviour.
+
+> Note: the global seed lives in module scope, and Jest gives each test file its
+> own module registry. A `useSeed()` in a shared setup file will not reach your
+> test files - seed inside each file instead.
 
 ### Local:
 
 ```ts
 import {Builder} from '@maarkis/fluent-faker'
 
-new Builder<Todo>().useSeed(596) // 596
+new Builder<Todo>().useSeed(596) // returns the Builder, so it chains
+
+new Builder<Todo>().useSeed(596).seed // 596
+```
+
+## Rule precedence
+
+Rules are applied in three layers. A later layer overwrites an earlier one for
+any property both define.
+
+| Layer | Set by | Role |
+| ----- | ------ | ---- |
+| 1 | `addModel` / `createBuilder` | factory defaults |
+| 2 | `addSet` + `useSet` | traits, in activation order |
+| 3 | `ruleFor` | explicit per-instance override |
+
+```ts
+createBuilder<Todo>({ done: false })   // layer 1
+    .addSet('done', { done: true })
+    .useSet('done')                    // layer 2 wins over the model
+    .generate() // { done: true }
+
+createBuilder<Todo>({ done: false })
+    .addSet('done', { done: true })
+    .useSet('done')
+    .ruleFor('done', false)            // layer 3 wins over the set
+    .generate() // { done: false }
+```
+
+`ruleFor` beats a set regardless of call order. Sets stack, so
+`.useSet('a').useSet('b')` applies both, with `b` winning any conflict.
+
+### Clearing
+
+```ts
+import {clearSeed} from '@maarkis/fluent-faker'
+
+afterEach(() => clearSeed())
+```
+
+## Limits
+
+`generate(length)` accepts non-negative integers only, up to
+`MAX_GENERATE_LENGTH` (1,000,000). Anything else throws a `RangeError`.
+Generate in batches when a larger collection is intentional.
+
+```ts
+import {MAX_GENERATE_LENGTH} from '@maarkis/fluent-faker'
+
+generate<Todo>({id: 1}, -1)    // RangeError
+generate<Todo>({id: 1}, 2.5)   // RangeError
+generate<Todo>({id: 1}, 1e9)   // RangeError
 ```
 
 ## API Reference
@@ -342,12 +400,12 @@ new Builder<Todo>()
 |--------|----------|-----------------|:--------:|
 | _seed_ | `number` | The seed to set |   yes    |
 
-Returns: `number`
+Returns: `Builder` instance. Read the effective seed through the `seed` getter.
 
 Usage:
 
 ```ts
-new Builder<Todo>().useSeed(1) // 1
+new Builder<Todo>().useSeed(1).seed // 1
 ```
 
 ---
@@ -356,9 +414,19 @@ new Builder<Todo>().useSeed(1) // 1
 
 **Parameters:**
 
-| Name   | Type     | Description  |
-|--------|----------|--------------|
-| _name_ | `string` | The set name |
+| Name   | Type     | Description                              |
+|--------|----------|------------------------------------------|
+| _name_ | `string` | The set name, matched case-insensitively |
+
+Throws `Error` when no set was registered under that name. The message lists
+the sets that are defined.
+
+```ts
+new Builder<Todo>()
+    .addSet('todo done', {done: true})
+    .useSet('todo dnoe')
+// Error: Unknown set: 'todo dnoe'. Defined sets are: 'todo done'.
+```
 
 Returns: `Builder` instance
 
