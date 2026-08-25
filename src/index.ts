@@ -1,6 +1,7 @@
-import { Faker, faker } from '@faker-js/faker';
+import { Faker } from '@faker-js/faker';
 import { Builder } from './builder';
 import isFunction from 'lodash.isfunction';
+import { setGlobalSeed } from './seed';
 
 /**
  * Create a new instance of Builder
@@ -71,7 +72,7 @@ export function generate<T>(model: Partial<T>, length?: number): T | Array<T> {
  * 	@return The seed that was set
  */
 export function useSeed(seed?: number): number {
-	return faker.seed(seed);
+	return setGlobalSeed(seed);
 }
 
 export { Builder };

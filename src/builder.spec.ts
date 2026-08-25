@@ -73,9 +73,10 @@ describe(`Suite test ${Builder.name}`, () => {
 	});
 
 	it(`${seedName} should set seed correctly`, () => {
-		const seed = sut.useSeed(1);
+		const returned = sut.useSeed(1);
 
-		expect(seed).toStrictEqual(1);
+		expect(returned).toBe(sut);
+		expect(sut.seed).toStrictEqual(1);
 	});
 
 	it(`${addModelName} should build from complex configuration`, () => {
