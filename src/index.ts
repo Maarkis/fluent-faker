@@ -15,7 +15,7 @@ export function createBuilder<T>(): Builder<T>;
  * @param model Initial setup for the builder using faker
  * @example
  * 		createBuilder<{ name: string }>((faker) => ({
- * 			name: faker.name.firstName(),
+ * 			name: faker.person.firstName(),
  * 		}))
  * @return new instance of Builder with presets
  */
@@ -43,7 +43,7 @@ export function createBuilder<T>(model: Partial<T>, locale: string): Builder<T>;
  * @param model Initial setup for the builder
  * @param locale The locale to set (e.g. `en` or `pt_BR`).
  * @example
- * 		createBuilder<{ name: string }>((faker) => ({ name: faker.name.firstName() }), 'pt_BR')
+ * 		createBuilder<{ name: string }>((faker) => ({ name: faker.person.firstName() }), 'pt_BR')
  * @return new instance of Builder with presets
  */
 export function createBuilder<T>(model: (faker: Faker) => Partial<T>, locale: string): Builder<T>;

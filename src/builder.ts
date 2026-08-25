@@ -63,8 +63,8 @@ export class Builder<T> {
 	 * @param model The dataset to apply when the set is specified, presets are not stored
 	 * @example
 	 * 		new Builder<People>().addModel(faker => ({
-	 * 			name: faker.name.firstName(),
-	 * 			lastName: faker.name.lastName()
+	 * 			name: faker.person.firstName(),
+	 * 			lastName: faker.person.lastName()
 	 * 		}))
 	 * @return instance of Builder
 	 */
@@ -97,8 +97,8 @@ export class Builder<T> {
 	 * @param dataSet The dataset to apply when the set is specified, presets are stored
 	 * @example
 	 * 		new Builder<People>().addSet('good person', faker => ({
-	 * 			name: faker.name.firstName(),
-	 * 			lastName: faker.name.lastName()
+	 * 			name: faker.person.firstName(),
+	 * 			lastName: faker.person.lastName()
 	 * 		}))
 	 * @return instance of Builder
 	 */
