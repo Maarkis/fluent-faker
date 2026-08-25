@@ -1,7 +1,7 @@
 {
   "name": "@maarkis/fluent-faker",
   "version": "0.2.0",
-  "description": "",
+  "description": "A library for generating data in a simple way for testing",
   "author": "Jean Markis",
   "keywords": [
     "faker",
@@ -47,26 +47,20 @@
   "files": [
     "dist/"
   ],
-  "main": "dist/cjs/index.js",
-  "module": "dist/mjs/index.js",
-  "types": "index.d.ts",
+  "main": "./dist/cjs/index.js",
+  "module": "./dist/mjs/index.js",
+  "types": "./dist/types/index.d.ts",
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
       "import": "./dist/mjs/index.js",
       "require": "./dist/cjs/index.js"
     },
-    "./builder/*": {
+    "./builder": {
       "types": "./dist/types/builder.d.ts",
       "import": "./dist/mjs/builder.js",
       "require": "./dist/cjs/builder.js"
-    }
-  },
-  "typesVersions": {
-    ">=0.0.1": {
-      "*": [
-        "dist/types/*"
-      ]
     }
   },
   "license": "MIT",
