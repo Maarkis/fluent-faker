@@ -4,6 +4,7 @@ import isFunction from 'lodash.isfunction';
 import cloneDeep from 'lodash.clonedeep';
 import { Locale, getLocale } from './locale';
 import { Rule } from './rule';
+import { getGlobalSeed } from './seed';
 
 export class Builder<T> {
 	private rules: Rule<T, keyof T>[] = [];
@@ -17,6 +18,12 @@ export class Builder<T> {
 	 * @private localSeed
 	 */
 	private localSeed?: number;
+
+	/**
+	 * Whether this instance's PRNG was already primed with the effective seed.
+	 * @private seeded
+	 */
+	private seeded = false;
 
 	/**
 	 * The internal Faker object that is used in (faker) => faker rules.
@@ -182,6 +189,8 @@ export class Builder<T> {
 		if (length && length < 0)
 			throw new Error('property length be greater than greater than or equal to 0.');
 
+		this.ensureSeeded();
+
 		const [useSet, rulesSetsFactoryFunction] = this.rulesSetsFactoryFunction;
 		const rulesFactoryFunction = this.createFactoryFunction(this.rules);
 		const factoryFunction =
@@ -217,8 +226,30 @@ export class Builder<T> {
 	 * 		new Builder<People>().useSeed(1)
 	 * 	@return The seed that was set
 	 */
-	public useSeed(seed: number): number {
-		return (this.localSeed = this.faker.seed(seed));
+	public useSeed(seed: number): Builder<T> {
+		this.localSeed = seed;
+		this.faker.seed(seed);
+		this.seeded = true;
+		return this;
+	}
+
+	/**
+	 * The seed in effect for this instance (local, falling back to the global one).
+	 * @return The effective seed, or undefined when none was set
+	 */
+	public get seed(): number | undefined {
+		return this.localSeed ?? getGlobalSeed();
+	}
+
+	/**
+	 * Primes this instance's PRNG lazily, so a global seed set after construction
+	 * still applies. Runs at most once per instance.
+	 */
+	private ensureSeeded(): void {
+		if (this.seeded) return;
+		const seed = this.localSeed ?? getGlobalSeed();
+		if (seed !== undefined) this.faker.seed(seed);
+		this.seeded = true;
 	}
 
 	/**
@@ -228,8 +259,8 @@ export class Builder<T> {
 	 * @return  new Builder instance with cloned builder configuration
 	 */
 	public clone(): Builder<T> {
-		const builder = new Builder<T>();
-		if (this.localSeed) builder.useSeed(this.localSeed);
+		const builder = new Builder<T>(this._locale.code);
+		if (this.localSeed !== undefined) builder.useSeed(this.localSeed);
 
 		builder.rules = this.rules.map<Rule<T, keyof T>>((rule: Rule<T, keyof T>) => {
 			return {
