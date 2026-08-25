@@ -1,6 +1,6 @@
 import { Faker } from '@faker-js/faker';
 import { Builder } from './builder';
-import isFunction from 'lodash.isfunction';
+import { isFunction } from './internal';
 import { setGlobalSeed } from './seed';
 
 /**

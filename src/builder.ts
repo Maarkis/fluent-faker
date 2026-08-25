@@ -1,7 +1,5 @@
 import { Faker } from '@faker-js/faker';
-import reduce from 'lodash.reduce';
-import isFunction from 'lodash.isfunction';
-import cloneDeep from 'lodash.clonedeep';
+import { cloneDeep, isFunction } from './internal';
 import { Locale, getLocale } from './locale';
 import { Rule } from './rule';
 import { getGlobalSeed } from './seed';
@@ -321,8 +319,7 @@ export class Builder<T> {
 
 	private createFactoryFunction(rules: Rule<T, keyof T>[]): () => T {
 		return () =>
-			reduce<Rule<T, keyof T>, T>(
-				rules,
+			rules.reduce<T>(
 				(prev: T, curr: Rule<T, keyof T>): T => ({
 					...prev,
 					...this.propertyOrObject(curr),
