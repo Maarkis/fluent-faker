@@ -181,7 +181,7 @@ export class Builder<T> {
 	 * 		return new collection of People
 	 * @return The collection of generated instances of type {T}
 	 */
-	public generate(length?: number): Array<T>;
+	public generate(length?: number): T | Array<T>;
 	/**
 	 * Generate an instances or collection of instances of the type
 	 * @param length The number of instances to spawn
@@ -191,8 +191,10 @@ export class Builder<T> {
 	 * @return The collection of generated instances of type {T}
 	 */
 	public generate(length?: number): T | Array<T> {
-		if (length && length < 0)
-			throw new Error('property length be greater than greater than or equal to 0.');
+		if (length !== undefined && (!Number.isInteger(length) || length < 0))
+			throw new RangeError(
+				`length must be an integer greater than or equal to 0, received: ${length}.`,
+			);
 
 		this.ensureSeeded();
 
@@ -203,9 +205,9 @@ export class Builder<T> {
 			...this.rules,
 		]);
 
-		return length || length == 0
-			? this.buildWithQuantity(length, factoryFunction)
-			: this.build(factoryFunction);
+		return length === undefined
+			? this.build(factoryFunction)
+			: this.buildWithQuantity(length, factoryFunction);
 	}
 
 	/**
@@ -290,9 +292,7 @@ export class Builder<T> {
 	}
 
 	private buildWithQuantity(length: number, factory: () => T): Array<T> {
-		return length === 0
-			? Array.from<T>({ length: length })
-			: Array.apply(0, Array<T>(length)).map(() => factory());
+		return Array.from({ length }, (): T => factory());
 	}
 
 	private addRule(rule: Rule<T, keyof T>): void {

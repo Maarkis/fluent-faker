@@ -210,7 +210,8 @@ describe(`Suite test ${Builder.name}`, () => {
 			};
 			const value = () => sut.addModel(model).generate(length);
 
-			expect(value).toThrow('property length be greater than greater than or equal to 0.');
+			expect(value).toThrow(RangeError);
+			expect(value).toThrow(/length must be an integer greater than or equal to 0/);
 		},
 	);
 
