@@ -7,9 +7,15 @@ import { Rule } from './rule';
 import { getGlobalSeed } from './seed';
 
 export class Builder<T> {
+	/** Layer 1 - factory defaults, set through addModel. */
+	private modelRules: Rule<T, keyof T>[] = [];
+
+	/** Layer 2 - traits activated through useSet, in activation order. */
+	private activeSetRules: Rule<T, keyof T>[] = [];
+
+	/** Layer 3 - explicit per-instance overrides, set through ruleFor. */
 	private rules: Rule<T, keyof T>[] = [];
 	private rulesSets: Map<string, Rule<T, keyof T>[]> = new Map<string, Rule<T, keyof T>[]>();
-	private rulesSetsFactoryFunction: [useSet: boolean, factoryFunction?: () => T] = [false];
 
 	private readonly _locale: Locale;
 
@@ -67,13 +73,11 @@ export class Builder<T> {
 	public addModel(model: (faker: Faker) => Partial<T>): Builder<T>;
 	public addModel(model: Partial<T> | ((faker: Faker) => Partial<T>)): Builder<T> {
 		if (isFunction(model)) {
-			this.addRule({
-				valueFunction: model,
-			});
+			this.modelRules.push({ valueFunction: model });
 			return this;
 		}
 		const clone = cloneDeep(model);
-		this.rules.push(...this.createRulesByEntries(clone));
+		this.modelRules.push(...this.createRulesByEntries(clone));
 		return this;
 	}
 
@@ -124,12 +128,13 @@ export class Builder<T> {
 	 * @return instance of Builder
 	 */
 	public useSet(name: string): Builder<T> {
-		const rulesSets = this.rulesSets.get(name.toLowerCase());
-		if (!rulesSets) {
+		const rulesSet = this.rulesSets.get(name.toLowerCase());
+		if (!rulesSet) {
 			return this;
 		}
 
-		this.rulesSetsFactoryFunction = [true, this.createFactoryFunction(rulesSets)];
+		// Traits stack in activation order; a later set wins over an earlier one.
+		this.activeSetRules.push(...rulesSet);
 		return this;
 	}
 
@@ -191,17 +196,12 @@ export class Builder<T> {
 
 		this.ensureSeeded();
 
-		const [useSet, rulesSetsFactoryFunction] = this.rulesSetsFactoryFunction;
-		const rulesFactoryFunction = this.createFactoryFunction(this.rules);
-		const factoryFunction =
-			useSet && rulesSetsFactoryFunction
-				? () => ({
-					...rulesSetsFactoryFunction(),
-					...rulesFactoryFunction(),
-				})
-				: () => ({
-					...rulesFactoryFunction(),
-				});
+		// Later layers overwrite earlier ones: defaults < traits < explicit rules.
+		const factoryFunction = this.createFactoryFunction([
+			...this.modelRules,
+			...this.activeSetRules,
+			...this.rules,
+		]);
 
 		return length || length == 0
 			? this.buildWithQuantity(length, factoryFunction)
@@ -262,12 +262,15 @@ export class Builder<T> {
 		const builder = new Builder<T>(this._locale.code);
 		if (this.localSeed !== undefined) builder.useSeed(this.localSeed);
 
-		builder.rules = this.rules.map<Rule<T, keyof T>>((rule: Rule<T, keyof T>) => {
-			return {
+		const copy = (rules: Rule<T, keyof T>[]): Rule<T, keyof T>[] =>
+			rules.map((rule: Rule<T, keyof T>) => ({
 				valueFunction: rule.valueFunction,
 				property: rule.property,
-			};
-		});
+			}));
+
+		builder.modelRules = copy(this.modelRules);
+		builder.activeSetRules = copy(this.activeSetRules);
+		builder.rules = copy(this.rules);
 
 		this.rulesSets.forEach((rules: Rule<T, keyof T>[], key: string) => {
 			const clonedRulesSets = rules.map((rule: Rule<T, keyof T>) => {
