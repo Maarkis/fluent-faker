@@ -1,3 +1,10 @@
+# [0.3.0](https://github.com/Maarkis/fluent-faker/compare/v0.2.1...v0.3.0) (2026-08-26)
+
+
+### Features
+
+* create GitHub Releases on publish ([#6](https://github.com/Maarkis/fluent-faker/issues/6)) ([431577c](https://github.com/Maarkis/fluent-faker/commit/431577c7af122c5680a16aeff1a5eb780a8aa578))
+
 ## [0.2.1](https://github.com/Maarkis/fluent-faker/compare/v0.2.0...v0.2.1) (2026-08-26)
 
 
