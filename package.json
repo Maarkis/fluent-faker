@@ -104,5 +104,10 @@
     "lodash.clonedeep": "^4.5.0",
     "lodash.isfunction": "^3.0.9",
     "lodash.reduce": "^4.6.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "@semantic-release/npm": "^13.1.5"
+    }
   }
 }
