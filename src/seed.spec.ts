@@ -8,7 +8,7 @@ interface Todo {
 const idBuilder = () => createBuilder<Todo>((f) => ({ id: f.number.int() }));
 
 describe('seed', () => {
-	it('mesmo seed global => mesmos valores', () => {
+	it('same global seed => same values', () => {
 		useSeed(596);
 		const a = idBuilder().generate();
 		useSeed(596);
@@ -16,7 +16,7 @@ describe('seed', () => {
 		expect(a.id).toBe(b.id);
 	});
 
-	it('seed global definido DEPOIS da construcao do builder ainda vale', () => {
+	it('global seed set AFTER the builder is constructed still applies', () => {
 		const b1 = idBuilder();
 		useSeed(42);
 		const a = b1.generate();
@@ -25,7 +25,7 @@ describe('seed', () => {
 		expect(b2.generate().id).toBe(a.id);
 	});
 
-	it('seed local sobrescreve o global', () => {
+	it('local seed overrides the global one', () => {
 		useSeed(1);
 		const a = idBuilder().useSeed(999).generate();
 		useSeed(2);
@@ -33,13 +33,13 @@ describe('seed', () => {
 		expect(a.id).toBe(b.id);
 	});
 
-	it('seed 0 e um seed valido (nao pode ser tratado como falsy)', () => {
+	it('seed 0 is a valid seed (must not be treated as falsy)', () => {
 		const a = idBuilder().useSeed(0).generate();
 		const b = idBuilder().useSeed(0).generate();
 		expect(a.id).toBe(b.id);
 	});
 
-	it('builders sao isolados: um nao consome o PRNG do outro', () => {
+	it('builders are isolated: one does not consume the other one\'s PRNG', () => {
 		useSeed(7);
 		const solo = idBuilder().generate();
 		useSeed(7);
@@ -49,12 +49,12 @@ describe('seed', () => {
 });
 
 describe('clone', () => {
-	it('preserva o locale do builder de origem', () => {
+	it('preserves the locale of the source builder', () => {
 		const original = new Builder<Todo>('pt_BR');
 		expect(original.clone().locale).toBe('pt_BR');
 	});
 
-	it('preserva o seed 0 (nao pode ser tratado como falsy)', () => {
+	it('preserves seed 0 (must not be treated as falsy)', () => {
 		const original = createBuilder<Todo>((f) => ({
 			id: f.number.int(),
 		})).useSeed(0);
