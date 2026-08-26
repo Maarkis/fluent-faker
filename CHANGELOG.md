@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/Maarkis/fluent-faker/compare/v1.0.3...v1.0.4) (2026-08-26)
+
+
+### Bug Fixes
+
+* add .js extensions to relative imports in ESM build output ([#8](https://github.com/Maarkis/fluent-faker/issues/8)) ([62e071f](https://github.com/Maarkis/fluent-faker/commit/62e071f63f1fc324f3fcec21cfccddf5f84e80e3))
+
 # [0.3.0](https://github.com/Maarkis/fluent-faker/compare/v0.2.1...v0.3.0) (2026-08-26)
 
 
