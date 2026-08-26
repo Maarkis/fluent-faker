@@ -1,3 +1,10 @@
+## [0.2.1](https://github.com/Maarkis/fluent-faker/compare/v0.2.0...v0.2.1) (2026-08-26)
+
+
+### Bug Fixes
+
+* force @semantic-release/npm 13.1.5 even in semantic-release's own nested dependency ([#5](https://github.com/Maarkis/fluent-faker/issues/5)) ([e5ec34e](https://github.com/Maarkis/fluent-faker/commit/e5ec34ef560457bd743e97ec404bdc7da5851acc))
+
 # [0.2.0](https://github.com/Maarkis/fluent-faker/compare/v0.1.0...v0.2.0) (2024-01-02)
 
 
