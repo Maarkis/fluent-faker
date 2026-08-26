@@ -36,6 +36,7 @@
     "check": "prettier --check \"src/**/*.ts\" && eslint --ext .js,.ts .",
     "prettier": "prettier --write \"src/**/*.ts\"",
     "test": "jest",
+    "test:smoke": "node scripts/smoke-test.mjs && node scripts/smoke-test.cjs && tsc -p tsconfig-smoke-types.json",
     "coverage": "jest --coverage",
     "lint": "eslint --ext .js,.ts . --fix",
     "clean": "rimraf dist coverage node_modules",
