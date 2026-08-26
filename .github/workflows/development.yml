@@ -47,6 +47,12 @@ jobs:
       - name: "🧪 Run test"
         run: pnpm test
 
+      - name: "📦 Build"
+        run: pnpm run build
+
+      - name: "🔥 Run smoke test (dist/cjs + dist/mjs)"
+        run: pnpm run test:smoke
+
       - name: "☂️ Collect Coverage"
         run: pnpm coverage
         if: ${{ matrix.node-version == '16.x' }}
