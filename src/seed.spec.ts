@@ -39,7 +39,7 @@ describe('seed', () => {
 		expect(a.id).toBe(b.id);
 	});
 
-	it('builders are isolated: one does not consume the other one\'s PRNG', () => {
+	it('builders are isolated: one does not consume the PRNG of another', () => {
 		useSeed(7);
 		const solo = idBuilder().generate();
 		useSeed(7);

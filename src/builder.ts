@@ -196,12 +196,12 @@ export class Builder<T> {
 		const factoryFunction =
 			useSet && rulesSetsFactoryFunction
 				? () => ({
-					...rulesSetsFactoryFunction(),
-					...rulesFactoryFunction(),
-				})
+						...rulesSetsFactoryFunction(),
+						...rulesFactoryFunction(),
+					})
 				: () => ({
-					...rulesFactoryFunction(),
-				});
+						...rulesFactoryFunction(),
+					});
 
 		return length || length == 0
 			? this.buildWithQuantity(length, factoryFunction)
