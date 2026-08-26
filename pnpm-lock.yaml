@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@semantic-release/npm': ^13.1.5
+
 dependencies:
   '@faker-js/faker':
     specifier: ^8.3.1
@@ -1078,28 +1081,6 @@ packages:
       url-join: 5.0.0
     transitivePeerDependencies:
       - supports-color
-    dev: true
-
-  /@semantic-release/npm@11.0.2(semantic-release@22.0.12):
-    resolution: {integrity: sha512-owtf3RjyPvRE63iUKZ5/xO4uqjRpVQDUB9+nnXj0xwfIeM9pRl+cG+zGDzdftR4m3f2s4Wyf3SexW+kF5DFtWA==}
-    engines: {node: ^18.17 || >=20}
-    peerDependencies:
-      semantic-release: '>=20.1.0'
-    dependencies:
-      '@semantic-release/error': 4.0.0
-      aggregate-error: 5.0.0
-      execa: 8.0.1
-      fs-extra: 11.2.0
-      lodash-es: 4.17.21
-      nerf-dart: 1.0.0
-      normalize-url: 8.0.0
-      npm: 10.2.5
-      rc: 1.2.8
-      read-pkg: 9.0.1
-      registry-auth-token: 5.0.2
-      semantic-release: 22.0.12(typescript@5.3.3)
-      semver: 7.5.4
-      tempy: 3.1.0
     dev: true
 
   /@semantic-release/npm@13.1.5(semantic-release@22.0.12):
@@ -4285,11 +4266,6 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /normalize-url@8.0.0:
-    resolution: {integrity: sha512-uVFpKhj5MheNBJRTiMZ9pE/7hD1QTeEvugSJW/OmLzAp78PB5O6adfMNTvmfKhXBkvCzC+rqifWcVYpGFwTjnw==}
-    engines: {node: '>=14.16'}
-    dev: true
-
   /normalize-url@9.0.1:
     resolution: {integrity: sha512-ARftfC5HdUNu9jJeL8pHj8debUIHA2b91FizCoMzY4lG6dDX13jdvTK0TBe24IBDRf2HvJSzzwEPvmbkQWHRSg==}
     engines: {node: '>=20'}
@@ -4316,84 +4292,6 @@ packages:
       path-key: 4.0.0
       unicorn-magic: 0.3.0
     dev: true
-
-  /npm@10.2.5:
-    resolution: {integrity: sha512-lXdZ7titEN8CH5YJk9C/aYRU9JeDxQ4d8rwIIDsvH3SMjLjHTukB2CFstMiB30zXs4vCrPN2WH6cDq1yHBeJAw==}
-    engines: {node: ^18.17.0 || >=20.5.0}
-    hasBin: true
-    dev: true
-    bundledDependencies:
-      - '@isaacs/string-locale-compare'
-      - '@npmcli/arborist'
-      - '@npmcli/config'
-      - '@npmcli/fs'
-      - '@npmcli/map-workspaces'
-      - '@npmcli/package-json'
-      - '@npmcli/promise-spawn'
-      - '@npmcli/run-script'
-      - '@sigstore/tuf'
-      - abbrev
-      - archy
-      - cacache
-      - chalk
-      - ci-info
-      - cli-columns
-      - cli-table3
-      - columnify
-      - fastest-levenshtein
-      - fs-minipass
-      - glob
-      - graceful-fs
-      - hosted-git-info
-      - ini
-      - init-package-json
-      - is-cidr
-      - json-parse-even-better-errors
-      - libnpmaccess
-      - libnpmdiff
-      - libnpmexec
-      - libnpmfund
-      - libnpmhook
-      - libnpmorg
-      - libnpmpack
-      - libnpmpublish
-      - libnpmsearch
-      - libnpmteam
-      - libnpmversion
-      - make-fetch-happen
-      - minimatch
-      - minipass
-      - minipass-pipeline
-      - ms
-      - node-gyp
-      - nopt
-      - normalize-package-data
-      - npm-audit-report
-      - npm-install-checks
-      - npm-package-arg
-      - npm-pick-manifest
-      - npm-profile
-      - npm-registry-fetch
-      - npm-user-validate
-      - npmlog
-      - p-map
-      - pacote
-      - parse-conflict-json
-      - proc-log
-      - qrcode-terminal
-      - read
-      - semver
-      - spdx-expression-parse
-      - ssri
-      - strip-ansi
-      - supports-color
-      - tar
-      - text-table
-      - tiny-relative-date
-      - treeverse
-      - validate-npm-package-name
-      - which
-      - write-file-atomic
 
   /npm@11.19.0:
     resolution: {integrity: sha512-SDd/hHg3KqHE5Ht2NHWxNYNtqCQ2pXAPLl6OtQhPyED5PHsRfrOtO199MZTIG2cQoQ1ZRI9t28shrD+2cr3AAw==}
@@ -5001,7 +4899,7 @@ packages:
       '@semantic-release/commit-analyzer': 11.1.0(semantic-release@22.0.12)
       '@semantic-release/error': 4.0.0
       '@semantic-release/github': 9.2.6(semantic-release@22.0.12)
-      '@semantic-release/npm': 11.0.2(semantic-release@22.0.12)
+      '@semantic-release/npm': 13.1.5(semantic-release@22.0.12)
       '@semantic-release/release-notes-generator': 12.1.0(semantic-release@22.0.12)
       aggregate-error: 5.0.0
       cosmiconfig: 8.3.6(typescript@5.3.3)
