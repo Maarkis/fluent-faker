@@ -1,25 +1,3 @@
-# [1.0.0](https://github.com/Maarkis/fluent-faker/compare/v0.3.0...v1.0.0) (2026-08-26)
-
-
-### Bug Fixes
-
-* make global seed actually reach every Builder instance ([#7](https://github.com/Maarkis/fluent-faker/issues/7)) ([d7758c7](https://github.com/Maarkis/fluent-faker/commit/d7758c7310dc888c8301b01569d9151aca7e327e))
-
-
-### BREAKING CHANGES
-
-* `Builder.useSeed()` now returns `Builder<T>` instead of
-`number`. Use the new `Builder.seed` getter to read the effective seed.
-
-* test: translate seed.spec.ts descriptions to English
-
-* fix: make pre-commit hook executable and fix formatting issues it now enforces
-
-The pre-commit hook was tracked as non-executable (100644), so husky
-silently skipped tests/lint on every commit. Fixed the mode and
-resolved the prettier/eslint issues it surfaced in builder.ts and
-seed.spec.ts.
-
 # [0.3.0](https://github.com/Maarkis/fluent-faker/compare/v0.2.1...v0.3.0) (2026-08-26)
 
 
