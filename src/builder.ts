@@ -253,7 +253,7 @@ export class Builder<T> {
 	}
 
 	/**
-	 * Clone hte internal state into a new so that both are isolated from each other
+	 * Clone the internal state into a new so that both are isolated from each other
 	 * @example
 	 * 		const otherBuilder = new Builder<People>().clone()
 	 * @return  new Builder instance with cloned builder configuration
