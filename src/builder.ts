@@ -10,6 +10,7 @@ export class Builder<T> {
 	private rules: Rule<T, keyof T>[] = [];
 	private rulesSets: Map<string, Rule<T, keyof T>[]> = new Map<string, Rule<T, keyof T>[]>();
 	private rulesSetsFactoryFunction: [useSet: boolean, factoryFunction?: () => T] = [false];
+	private activeSetName?: string;
 
 	private readonly _locale: Locale;
 
@@ -130,6 +131,7 @@ export class Builder<T> {
 		}
 
 		this.rulesSetsFactoryFunction = [true, this.createFactoryFunction(rulesSets)];
+		this.activeSetName = name;
 		return this;
 	}
 
@@ -278,6 +280,8 @@ export class Builder<T> {
 			});
 			builder.addRuleSets(key, clonedRulesSets);
 		});
+
+		if (this.activeSetName !== undefined) builder.useSet(this.activeSetName);
 
 		return builder;
 	}
