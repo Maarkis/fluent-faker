@@ -61,7 +61,8 @@ export function generate<T>(model: (faker: Faker) => Partial<T>): T;
 export function generate<T>(model: (faker: Faker) => Partial<T>, length: number): Array<T>;
 export function generate<T>(model: Partial<T>, length: number): Array<T>;
 export function generate<T>(model: Partial<T>, length?: number): T | Array<T> {
-	return new Builder<T>().addModel(model).generate(length);
+	const builder = new Builder<T>().addModel(model);
+	return length === undefined ? builder.generate() : builder.generate(length);
 }
 
 /**
