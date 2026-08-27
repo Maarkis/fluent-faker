@@ -1,7 +1,8 @@
 {
   "name": "@maarkis/fluent-faker",
   "version": "1.0.5",
-  "description": "",
+  "description": "A fluent, TypeScript-first builder for generating fake test data, backed by Faker.js",
+  "homepage": "https://github.com/Maarkis/fluent-faker#readme",
   "author": "Jean Markis",
   "keywords": [
     "faker",
@@ -18,8 +19,7 @@
     "fluent faker data generator"
   ],
   "engines": {
-    "node": ">=14",
-    "pnpm": ">=7.14"
+    "node": ">=14"
   },
   "repository": {
     "type": "git",
@@ -51,6 +51,7 @@
   "main": "dist/cjs/index.js",
   "module": "dist/mjs/index.js",
   "types": "dist/types/index.d.ts",
+  "sideEffects": false,
   "exports": {
     ".": {
       "types": "./dist/types/index.d.ts",
