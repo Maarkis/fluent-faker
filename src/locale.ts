@@ -5,6 +5,8 @@ export interface Locale {
 	locale: LocaleDefinition;
 }
 
+export type LocaleCode = keyof typeof allLocales;
+
 /**
  * Generates an array of Locale objects based on the allLocales object.
  *
