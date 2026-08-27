@@ -187,7 +187,7 @@ export class Builder<T> {
 	 */
 	public generate(length?: number): T | Array<T> {
 		if (length && length < 0)
-			throw new Error('property length be greater than greater than or equal to 0.');
+			throw new Error(`length must be greater than or equal to 0, received ${length}.`);
 
 		this.ensureSeeded();
 
