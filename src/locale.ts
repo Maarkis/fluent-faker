@@ -1,4 +1,4 @@
-import { LocaleDefinition, allLocales } from '@faker-js/faker';
+import { Faker, LocaleDefinition, allLocales } from '@faker-js/faker';
 
 export interface Locale {
 	code: string;
@@ -60,24 +60,28 @@ function closestLocaleCodes(codeLocale: string, limit = 3): string[] {
 }
 
 /**
- * Retrieves the locale object for the given code.
+ * Retrieves the locale object for the given code, LocaleDefinition, or Faker instance.
  *
- * @param {string} codeLocale - The code of the locale to retrieve. Omit it to get the default locale.
- * @throws {Error} When codeLocale is provided but does not match a known Faker locale.
+ * @param {LocaleCode | LocaleDefinition | Faker} codeLocale - The locale to retrieve. Omit it to get the default locale.
+ * @throws {Error} When codeLocale is a string that does not match a known Faker locale code.
  * @return {Locale} The matching locale object.
  */
-export function getLocale(codeLocale?: LocaleCode): Locale {
+export function getLocale(codeLocale?: LocaleCode | LocaleDefinition | Faker): Locale {
 	if (codeLocale === undefined) return defaultLocale();
 
-	const locale = (allLocales as Record<string, LocaleDefinition>)[codeLocale];
-	if (!locale) {
-		const suggestions = closestLocaleCodes(codeLocale);
-		throw new Error(
-			`Unknown locale: '${codeLocale}'. Did you mean: ${suggestions
-				.map((code: string): string => `'${code}'`)
-				.join(', ')}?`,
-		);
+	if (typeof codeLocale === 'string') {
+		const locale = (allLocales as Record<string, LocaleDefinition>)[codeLocale];
+		if (!locale) {
+			const suggestions = closestLocaleCodes(codeLocale);
+			throw new Error(
+				`Unknown locale: '${codeLocale}'. Did you mean: ${suggestions
+					.map((code: string): string => `'${code}'`)
+					.join(', ')}?`,
+			);
+		}
+		return { code: codeLocale, locale };
 	}
 
-	return { code: codeLocale, locale };
+	const locale = codeLocale instanceof Faker ? codeLocale.rawDefinitions : codeLocale;
+	return { code: 'custom', locale };
 }
