@@ -1,4 +1,4 @@
-import { LocaleDefinition, allLocales } from '@faker-js/faker';
+import { Faker, LocaleDefinition, allLocales } from '@faker-js/faker';
 
 export interface Locale {
 	code: string;
@@ -37,8 +37,15 @@ function defaultLocale(): Locale {
  * @param {string} codeLocale - The code of the locale to retrieve.
  * @return {Locale} The locale object that matches the provided codeLocale. If no match is found, the default locale is returned.
  */
-export function getLocale(codeLocale?: string): Locale {
-	if (!codeLocale) return defaultLocale();
+export function getLocale(codeLocale?: string | LocaleDefinition | Faker): Locale {
+	if (codeLocale === undefined) return defaultLocale();
 
-	return locales().find(({ code }: Locale): boolean => code === codeLocale) ?? defaultLocale();
+	if (typeof codeLocale === 'string') {
+		return (
+			locales().find(({ code }: Locale): boolean => code === codeLocale) ?? defaultLocale()
+		);
+	}
+
+	const locale = codeLocale instanceof Faker ? codeLocale.rawDefinitions : codeLocale;
+	return { code: 'custom', locale };
 }

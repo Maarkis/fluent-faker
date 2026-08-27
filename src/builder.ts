@@ -1,4 +1,4 @@
-import { Faker } from '@faker-js/faker';
+import { Faker, LocaleDefinition } from '@faker-js/faker';
 import reduce from 'lodash.reduce';
 import isFunction from 'lodash.isfunction';
 import cloneDeep from 'lodash.clonedeep';
@@ -38,7 +38,7 @@ export class Builder<T> {
 	 * 		new Builder<People>('pt_BR')
 	 * @return new instance of Builder
 	 */
-	constructor(locale?: string) {
+	constructor(locale?: string | LocaleDefinition | Faker) {
 		this._locale = getLocale(locale);
 		this.faker = new Faker({ locale: this._locale.locale });
 	}
