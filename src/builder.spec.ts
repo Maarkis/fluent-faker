@@ -234,12 +234,12 @@ describe(`Suite test ${Builder.name}`, () => {
 		expect(value).toStrictEqual({ id, name });
 	});
 
-	it(`${addSetName} should throw error when you have an item with the same key has already been added`, () => {
+	it(`${addSetName} should throw error naming the key when it has already been added`, () => {
 		sut.addSet('any set', { id: 1, name: 'name people' });
 
 		const value = () => sut.addSet('any set', { id: 1, name: 'other name people' });
 
-		expect(value).toThrow('An item with the same key has already been added');
+		expect(value).toThrow(/A set named 'any set' has already been added\./);
 	});
 
 	it(`${useSetName} should build object instance from set configuration`, () => {
