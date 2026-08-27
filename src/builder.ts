@@ -196,8 +196,8 @@ export class Builder<T> {
 		const factoryFunction =
 			useSet && rulesSetsFactoryFunction
 				? () => ({
-						...rulesSetsFactoryFunction(),
 						...rulesFactoryFunction(),
+						...rulesSetsFactoryFunction(),
 					})
 				: () => ({
 						...rulesFactoryFunction(),

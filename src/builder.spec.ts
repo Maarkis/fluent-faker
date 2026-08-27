@@ -294,7 +294,7 @@ describe(`Suite test ${Builder.name}`, () => {
 		expect(value).toStrictEqual([{}]);
 	});
 
-	it(`${ruleForName} should override defined set`, () => {
+	it(`${useSetName} should override a value set by ${ruleForName} for the same property`, () => {
 		const id = 1;
 		const name = 'name new people';
 		const otherName = 'other name';
@@ -308,7 +308,7 @@ describe(`Suite test ${Builder.name}`, () => {
 			.useSet('new people')
 			.generate(1);
 
-		expect(value).toStrictEqual([{ id, name: otherName }]);
+		expect(value).toStrictEqual([{ id, name }]);
 	});
 
 	it(`${cloneName} should generate a ${className} that generates the same values when using presets`, () => {
