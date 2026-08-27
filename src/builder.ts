@@ -176,15 +176,6 @@ export class Builder<T> {
 	 * 		return new collection of People
 	 * @return The collection of generated instances of type {T}
 	 */
-	public generate(length?: number): Array<T>;
-	/**
-	 * Generate an instances or collection of instances of the type
-	 * @param length The number of instances to spawn
-	 * @example
-	 * 		new Builder<People>().generate(2)
-	 * 		return new collection of People
-	 * @return The collection of generated instances of type {T}
-	 */
 	public generate(length?: number): T | Array<T> {
 		if (length && length < 0)
 			throw new Error('property length be greater than greater than or equal to 0.');
