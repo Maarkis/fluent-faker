@@ -285,13 +285,12 @@ describe(`Suite test ${Builder.name}`, () => {
 		expect(value).toStrictEqual(valueExpected);
 	});
 
-	it(`${useSetName} should building empty object when the set is not found`, () => {
-		const value = sut
-			.addSet('any set', { id: 1, name: 'name people' })
-			.useSet('other set')
-			.generate(1);
+	it(`${useSetName} should throw when the set is not found`, () => {
+		sut.addSet('any set', { id: 1, name: 'name people' });
 
-		expect(value).toStrictEqual([{}]);
+		const act = (): Builder<People> => sut.useSet('other set');
+
+		expect(act).toThrow(/Unknown set: 'other set'/);
 	});
 
 	it(`${ruleForName} should override defined set`, () => {
