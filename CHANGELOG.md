@@ -1,3 +1,10 @@
+## [1.0.5](https://github.com/Maarkis/fluent-faker/compare/v1.0.4...v1.0.5) (2026-08-27)
+
+
+### Bug Fixes
+
+* point root types field to the built declaration path ([#10](https://github.com/Maarkis/fluent-faker/issues/10)) ([f2f47f1](https://github.com/Maarkis/fluent-faker/commit/f2f47f12aeae47c8db56a75e702214eb9b9d012a))
+
 ## [1.0.4](https://github.com/Maarkis/fluent-faker/compare/v1.0.3...v1.0.4) (2026-08-26)
 
 
