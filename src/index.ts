@@ -1,5 +1,6 @@
 import { Faker } from '@faker-js/faker';
 import { Builder } from './builder';
+import { LocaleCode } from './locale';
 import isFunction from 'lodash.isfunction';
 import { setGlobalSeed } from './seed';
 
@@ -37,7 +38,7 @@ export function createBuilder<T>(model: Partial<T>): Builder<T>;
  * 		createBuilder<{ name: string }>({ name: 'person name' }, 'pt_BR')
  * @return new instance of Builder with presets
  */
-export function createBuilder<T>(model: Partial<T>, locale: string): Builder<T>;
+export function createBuilder<T>(model: Partial<T>, locale: LocaleCode): Builder<T>;
 /**
  * Create a new instance of Builder
  * @param model Initial setup for the builder
@@ -46,10 +47,13 @@ export function createBuilder<T>(model: Partial<T>, locale: string): Builder<T>;
  * 		createBuilder<{ name: string }>((faker) => ({ name: faker.name.firstName() }), 'pt_BR')
  * @return new instance of Builder with presets
  */
-export function createBuilder<T>(model: (faker: Faker) => Partial<T>, locale: string): Builder<T>;
+export function createBuilder<T>(
+	model: (faker: Faker) => Partial<T>,
+	locale: LocaleCode,
+): Builder<T>;
 export function createBuilder<T>(
 	model?: Partial<T> | ((faker: Faker) => Partial<T>),
-	locale?: string,
+	locale?: LocaleCode,
 ): Builder<T> {
 	if (isFunction(model)) return new Builder<T>(locale).addModel(model);
 
