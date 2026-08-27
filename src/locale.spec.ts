@@ -21,12 +21,12 @@ describe('Suite test Locale', () => {
 			});
 		});
 
-		it(`${getLocale.name} should return the default locale if no match is found for the provided codeLocale`, () => {
-			const locale = getLocale('pt_notExist');
-			expect(locale).toEqual({
-				code: 'en',
-				locale: en,
-			});
+		it(`${getLocale.name} should throw when the provided codeLocale does not exist`, () => {
+			expect(() => getLocale('pt_notExist')).toThrow(/Unknown locale: 'pt_notExist'/);
+		});
+
+		it(`${getLocale.name} should suggest close locale codes in the error message`, () => {
+			expect(() => getLocale('pt-BR')).toThrow(/'pt_BR'/);
 		});
 	});
 });
