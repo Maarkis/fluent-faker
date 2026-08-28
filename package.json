@@ -2,7 +2,7 @@
   "name": "@maarkis/fluent-faker",
   "version": "2.1.0",
   "description": "A fluent, TypeScript-first builder for generating fake test data, backed by Faker.js",
-  "homepage": "https://github.com/Maarkis/fluent-faker#readme",
+  "homepage": "https://maarkis.github.io/fluent-faker/",
   "author": "Jean Markis",
   "keywords": [
     "faker",
