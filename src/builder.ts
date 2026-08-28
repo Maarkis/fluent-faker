@@ -1,7 +1,7 @@
 import { Faker, LocaleDefinition } from '@faker-js/faker';
 import reduce from 'lodash.reduce';
-import isFunction from 'lodash.isfunction';
 import cloneDeep from 'lodash.clonedeep';
+import { isFunction } from './is-function';
 import { Locale, LocaleCode, getLocale } from './locale';
 import { Rule } from './rule';
 import { getGlobalSeed } from './seed';
