@@ -202,7 +202,7 @@ describe(`Suite test ${Builder.name}`, () => {
 	});
 
 	it.each([-1, -2])(
-		`${generateName} should throw error when parameter length be less zero`,
+		`${generateName} should throw a clear error when length is less than zero`,
 		(length: number) => {
 			const model: Partial<People> = {
 				id: 1,
@@ -210,7 +210,7 @@ describe(`Suite test ${Builder.name}`, () => {
 			};
 			const value = () => sut.addModel(model).generate(length);
 
-			expect(value).toThrow('property length be greater than greater than or equal to 0.');
+			expect(value).toThrow(`length must be greater than or equal to 0, received ${length}.`);
 		},
 	);
 
