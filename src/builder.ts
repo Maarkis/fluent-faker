@@ -1,5 +1,5 @@
 import { Faker, LocaleDefinition } from '@faker-js/faker';
-import cloneDeep from 'lodash.clonedeep';
+import { cloneDeep } from './clone-deep';
 import { isFunction } from './is-function';
 import { Locale, LocaleCode, getLocale } from './locale';
 import { Rule } from './rule';
