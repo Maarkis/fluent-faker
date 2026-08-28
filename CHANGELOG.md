@@ -1,3 +1,11 @@
+# [2.1.0](https://github.com/Maarkis/fluent-faker/compare/v2.0.0...v2.1.0) (2026-08-28)
+
+
+### Features
+
+* accept a LocaleDefinition or Faker instance as the locale ([#33](https://github.com/Maarkis/fluent-faker/issues/33)) ([050c5bb](https://github.com/Maarkis/fluent-faker/commit/050c5bbdf2dfd7e75c8b12fb8d8a3908dda0da42))
+* type the locale parameter as a union of valid codes ([#32](https://github.com/Maarkis/fluent-faker/issues/32)) ([c30f951](https://github.com/Maarkis/fluent-faker/commit/c30f951451c104ea4c00d661c86297035c5079f2))
+
 # [2.0.0](https://github.com/Maarkis/fluent-faker/compare/v1.0.5...v2.0.0) (2026-08-28)
 
 
