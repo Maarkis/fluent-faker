@@ -3,8 +3,8 @@
   "singleQuote": true,
   "bracketSameLine": true,
   "bracketSpacing": true,
-  "endOfLine": "crlf",
+  "endOfLine": "lf",
   "tabWidth": 4,
   "useTabs": true,
-  "arrowParents": "always"
+  "arrowParens": "always"
 }

@@ -1,4 +1,4 @@
-﻿import { Builder, createBuilder, generate, useSeed } from './index';
+import { Builder, createBuilder, generate, useSeed } from './index';
 import { faker } from '@faker-js/faker';
 
 describe('Suite test Index', () => {
