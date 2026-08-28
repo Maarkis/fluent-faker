@@ -300,9 +300,7 @@ export class Builder<T> {
 	}
 
 	private buildWithQuantity(length: number, factory: () => T): Array<T> {
-		return length === 0
-			? Array.from<T>({ length: length })
-			: Array.apply(0, Array<T>(length)).map(() => factory());
+		return Array.from({ length }, (): T => factory());
 	}
 
 	private addRule(rule: Rule<T, keyof T>): void {
