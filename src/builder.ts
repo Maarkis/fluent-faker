@@ -104,14 +104,14 @@ export class Builder<T> {
 	public addSet(name: string, dataSet: (faker: Faker) => Partial<T>): Builder<T>;
 	public addSet(name: string, dataSet: Partial<T> | ((faker: Faker) => Partial<T>)): Builder<T> {
 		if (isFunction(dataSet)) {
-			this.addRuleSet(name.toLowerCase(), {
+			this.addRuleSet(name, {
 				valueFunction: dataSet,
 			});
 			return this;
 		}
 
 		const clone = cloneDeep(dataSet);
-		this.addRuleSets(name.toLowerCase(), this.createRulesByEntries(clone));
+		this.addRuleSets(name, this.createRulesByEntries(clone));
 		return this;
 	}
 
@@ -126,7 +126,7 @@ export class Builder<T> {
 	 * @return instance of Builder
 	 */
 	public useSet(name: string): Builder<T> {
-		const rulesSets = this.rulesSets.get(name.toLowerCase());
+		const rulesSets = this.rulesSets.get(name);
 		if (!rulesSets) {
 			const known = [...this.rulesSets.keys()];
 			throw new Error(
@@ -309,7 +309,7 @@ export class Builder<T> {
 
 	private addRuleSets(name: string, rules: Array<Rule<T, keyof T>>): void {
 		if (this.rulesSets.has(name))
-			throw new Error('An item with the same key has already been added');
+			throw new Error(`A set named '${name}' has already been added.`);
 		this.rulesSets.set(name, rules);
 	}
 
