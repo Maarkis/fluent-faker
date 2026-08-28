@@ -1,5 +1,5 @@
 import { describe } from 'node:test';
-import { getLocale } from './locale';
+import { getLocale, LocaleCode } from './locale';
 import { en, pt_BR } from '@faker-js/faker';
 
 describe('Suite test Locale', () => {
@@ -22,11 +22,15 @@ describe('Suite test Locale', () => {
 		});
 
 		it(`${getLocale.name} should throw when the provided codeLocale does not exist`, () => {
-			expect(() => getLocale('pt_notExist')).toThrow(/Unknown locale: 'pt_notExist'/);
+			// Cast needed: LocaleCode only admits real codes, so this simulates a
+			// caller who bypasses the type system (a dynamic string, plain JS, etc).
+			expect(() => getLocale('pt_notExist' as LocaleCode)).toThrow(
+				/Unknown locale: 'pt_notExist'/,
+			);
 		});
 
 		it(`${getLocale.name} should suggest close locale codes in the error message`, () => {
-			expect(() => getLocale('pt-BR')).toThrow(/'pt_BR'/);
+			expect(() => getLocale('pt-BR' as LocaleCode)).toThrow(/'pt_BR'/);
 		});
 	});
 });

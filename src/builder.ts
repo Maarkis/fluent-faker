@@ -2,7 +2,7 @@ import { Faker } from '@faker-js/faker';
 import reduce from 'lodash.reduce';
 import isFunction from 'lodash.isfunction';
 import cloneDeep from 'lodash.clonedeep';
-import { Locale, getLocale } from './locale';
+import { Locale, LocaleCode, getLocale } from './locale';
 import { Rule } from './rule';
 import { getGlobalSeed } from './seed';
 
@@ -39,7 +39,7 @@ export class Builder<T> {
 	 * 		new Builder<People>('pt_BR')
 	 * @return new instance of Builder
 	 */
-	constructor(locale?: string) {
+	constructor(locale?: LocaleCode) {
 		this._locale = getLocale(locale);
 		this.faker = new Faker({ locale: this._locale.locale });
 	}
@@ -261,7 +261,7 @@ export class Builder<T> {
 	 * @return  new Builder instance with cloned builder configuration
 	 */
 	public clone(): Builder<T> {
-		const builder = new Builder<T>(this._locale.code);
+		const builder = new Builder<T>(this._locale.code as LocaleCode);
 		if (this.localSeed !== undefined) builder.useSeed(this.localSeed);
 
 		builder.rules = this.rules.map<Rule<T, keyof T>>((rule: Rule<T, keyof T>) => {

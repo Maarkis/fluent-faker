@@ -5,6 +5,8 @@ export interface Locale {
 	locale: LocaleDefinition;
 }
 
+export type LocaleCode = keyof typeof allLocales;
+
 const DEFAULT_LOCALE_CODE = 'en';
 
 /**
@@ -64,7 +66,7 @@ function closestLocaleCodes(codeLocale: string, limit = 3): string[] {
  * @throws {Error} When codeLocale is provided but does not match a known Faker locale.
  * @return {Locale} The matching locale object.
  */
-export function getLocale(codeLocale?: string): Locale {
+export function getLocale(codeLocale?: LocaleCode): Locale {
 	if (codeLocale === undefined) return defaultLocale();
 
 	const locale = (allLocales as Record<string, LocaleDefinition>)[codeLocale];
